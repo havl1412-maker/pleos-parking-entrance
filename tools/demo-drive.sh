@@ -5,10 +5,11 @@
 set -euo pipefail
 
 SCENARIO="${1:-arrive}"
-LNG=127.09468
-START_LAT=37.41000
-ENTRANCE_LAT=37.41450
-SPEED_MPS=8.0
+# 환경 변수로 바꿀 수 있다. 예: START_LAT=37.4110 SPEED_MPS=12 ./tools/demo-drive.sh arrive
+LNG="${LNG:-127.09468}"
+START_LAT="${START_LAT:-37.41000}"
+ENTRANCE_LAT="${ENTRANCE_LAT:-37.41450}"
+SPEED_MPS="${SPEED_MPS:-8.0}"
 
 END_LAT=$(awk -v e="$ENTRANCE_LAT" -v s="$SCENARIO" 'BEGIN { printf "%.6f", (s == "pass") ? e + 0.0015 : e }')
 STEP=$(awk -v v="$SPEED_MPS" 'BEGIN { printf "%.8f", v / 111000.0 }')

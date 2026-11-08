@@ -29,8 +29,8 @@
 
    ```
    # Windows PowerShell
-   .	ools\demo-drive.ps1              # 입구 도착
-   .	ools\demo-drive.ps1 -Scenario pass
+   .\tools\demo-drive.ps1              # 입구 도착
+   .\tools\demo-drive.ps1 -Scenario pass
    # macOS / Linux
    ./tools/demo-drive.sh arrive
    ./tools/demo-drive.sh pass

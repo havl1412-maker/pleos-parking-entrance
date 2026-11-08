@@ -53,4 +53,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
 
     implementation(libs.bundles.pleos.sdk)
+
+    testImplementation(libs.junit)
 }

@@ -10,7 +10,7 @@ Pleos Connect 에뮬레이터 v2.1.0에서 앱의 "SDK 점검판" 화면으로 �
 | 위치 (FusedLocation 1.1.3) | 동작 | 약 1초마다 갱신. 실행 중 권한 요청 필요 |
 | 근접 알림 | 동작 | 반경 300m ENTER/EXIT가 1~3초 안에 옴 |
 | 기어 (Vehicle 2.3.2) | 동작 | GEAR_PARK / GEAR_DRIVE. 단, deprecated API |
-| 음성 (TextToSpeech 3.3.1) | 초기화·호출 성공 | 실제 소리는 사람이 들어서 확인 필요 |
+| 음성 (TextToSpeech 3.3.1) | 동작 | 한국어로 들림. 에뮬레이터에서는 소리가 끊김 |
 | 주행 제한 (CarUxRestrictions) | 동작 | D단 전환 시 제한 상태로 바뀜 |
 
 ## 1. 내비 연동
@@ -45,7 +45,7 @@ Pleos Connect 에뮬레이터 v2.1.0에서 앱의 "SDK 점검판" 화면으로 �
 ## 5. 음성
 
 - `TextToSpeech(context, Mode.ON_DEVICE).initialize(listener)` → `onSuccess` → `setLocale(Locale.KOREA)` → `speak(text, true)` 호출 오류 없음.
-- 실제로 소리가 나는지는 사람이 에뮬레이터 소리를 듣고 확인해야 한다.
+- 실제 소리 확인(2026-11-08, 사람이 들음): 한국어로 나오지만 중간중간 끊긴다. 에뮬레이터의 PC 오디오 출력 문제일 가능성이 높다(실차와 무관). 시연 영상은 화면 녹화에 음성을 따로 입히는 방법도 고려.
 
 ## 6. 주행 제한
 

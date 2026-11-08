@@ -2,41 +2,41 @@ package com.lastmeter.parking
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.lastmeter.parking.check.SdkCheckScreen
+import com.lastmeter.parking.check.SdkCheckViewModel
 
 class MainActivity : ComponentActivity() {
+
+    private val checkViewModel: SdkCheckViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            // pleos.car.permission.FUSED_LOCATION 은 설치만으로는 허용되지 않아 실행 중에 요청해야 한다
+            val permissionLauncher = rememberLauncherForActivityResult(
+                ActivityResultContracts.RequestPermission()
+            ) { granted -> checkViewModel.log("LOC", "FUSED_LOCATION 권한 결과=$granted") }
+
             MaterialTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    PlaceholderScreen()
+                    SdkCheckScreen(
+                        vm = checkViewModel,
+                        onRequestLocationPermission = { permissionLauncher.launch(FUSED_LOCATION_PERMISSION) },
+                    )
                 }
             }
         }
     }
-}
 
-@Composable
-private fun PlaceholderScreen() {
-    Column(
-        modifier = Modifier.fillMaxSize().padding(48.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(text = "주차장 입구 안내", fontSize = 40.sp)
-        Text(text = "프로젝트 뼈대 v0.1.0", fontSize = 24.sp)
+    companion object {
+        const val FUSED_LOCATION_PERMISSION = "pleos.car.permission.FUSED_LOCATION"
     }
 }

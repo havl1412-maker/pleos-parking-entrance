@@ -35,6 +35,8 @@ android {
     buildFeatures {
         compose = true
     }
+    // AAOS 표준 Car API (CarUxRestrictionsManager 등)
+    useLibrary("android.car")
 }
 
 dependencies {

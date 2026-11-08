@@ -20,8 +20,8 @@
           "heightLimitM": 2.3,
           "feeText": "10분 1,000원",
           "hoursText": "24시간",
-          "photoFar": null,
-          "photoNear": null,
+          "photoFar": "dev-001-in-1-far.png",
+          "photoNear": "dev-001-in-1-near.png",
           "confusers": [
             {
               "description": "첫 번째 경사로는 옆 건물 주차장이에요",

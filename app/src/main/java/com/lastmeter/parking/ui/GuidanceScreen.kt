@@ -96,13 +96,19 @@ private fun ApproachCard(facility: Facility, entrance: Entrance, distanceM: Doub
 private fun AtEntranceCard(entrance: Entrance, distanceM: Double) {
     Column(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(24.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Spacer(Modifier.height(24.dp))
-        SideArrow(entrance.roadSide, size = 220)
-        Text(SpeechTexts.orderLine(entrance.roadSide, entrance.orderFromApproach), color = Accent, fontSize = 48.sp, fontWeight = FontWeight.Bold)
-        Text(entrance.landmark, color = TextMain, fontSize = 32.sp)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            SideArrow(entrance.roadSide, size = 150)
+            Spacer(Modifier.size(12.dp))
+            Column {
+                Text(SpeechTexts.orderLine(entrance.roadSide, entrance.orderFromApproach), color = Accent, fontSize = 44.sp, fontWeight = FontWeight.Bold)
+                Text(entrance.landmark, color = TextMain, fontSize = 30.sp)
+            }
+        }
+        // 입구 바로 앞에서는 정면 사진으로 "이 모양 입구"를 확인시킨다
+        EntrancePhoto(entrance.photoNear ?: entrance.photoFar)
         entrance.confusers.firstOrNull()?.let { c ->
             Box(
                 modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Warn).padding(20.dp),

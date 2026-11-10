@@ -6,3 +6,5 @@ gradlew text eol=lf
 *.jpg binary
 *.apk binary
 tools/demo-drive.sh text eol=lf
+*.ttf binary
+*.mp4 binary

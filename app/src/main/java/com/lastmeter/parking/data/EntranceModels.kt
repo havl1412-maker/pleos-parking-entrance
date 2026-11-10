@@ -33,6 +33,9 @@ data class Entrance(
     val photoNear: String?,
     /** 바로 옆에 있어서 헷갈리는 다른 건물 입구 */
     val confusers: List<Confuser>,
+    /** 밤에 찍은 사진(선택). 밤 모드일 때 있으면 이쪽을 보여 준다. 밤에는 간판 불빛이 달라 낮 사진으로는 알아보기 어렵다 */
+    val photoFarNight: String? = null,
+    val photoNearNight: String? = null,
 ) {
     val canEnter: Boolean get() = kind != EntranceKind.OUT
 }

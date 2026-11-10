@@ -87,6 +87,21 @@ class GuidanceEngineTest {
     }
 
     @Test
+    fun `입구가 여러 개면 달리는 방향에 맞는 입구를 고른다`() {
+        // 남쪽에서 올라올 때 쓰는 입구(e1)와, 북쪽에서 내려올 때 쓰는 입구(north)
+        val north = entrance.copy(id = "e2", lat = 37.4147, approachBearingDeg = 180.0, roadSide = RoadSide.LEFT, orderFromApproach = 1, confusers = emptyList())
+        val two = Facility("f2", "입구 둘 상가", "", listOf(entrance, north))
+
+        engine.setTarget(two)
+        at(37.4100); at(37.4110); at(37.4120) // 북쪽으로 달려 300m 안으로
+        assertEquals("e1", (engine.state as GuidanceState.Approaching).entrance.id)
+
+        engine.setTarget(two)
+        at(37.4190); at(37.4180); at(37.4170) // 남쪽으로 달려 300m 안으로
+        assertEquals("e2", (engine.state as GuidanceState.Approaching).entrance.id)
+    }
+
+    @Test
     fun `순서 표현`() {
         assertEquals("두", GuidanceEngine.ordinalKo(2))
         assertEquals("오른쪽 · 두 번째 경사로", SpeechTexts.orderLine(RoadSide.RIGHT, 2))

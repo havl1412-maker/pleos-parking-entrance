@@ -10,6 +10,14 @@
 |---|---|---|---|
 | ![](docs/images/01-approach-300m.png) | ![](docs/images/02-at-entrance.png) | ![](docs/images/03-passed.png) | ![](docs/images/04-parked.png) |
 
+| 밤 모드 | 내 차 높이 경고 (다른 방향 입구) | 화면이 내려가 있을 때 도착 알림 |
+|---|---|---|
+| ![](docs/images/06-night-mode.png) | ![](docs/images/07-height-warning.png) | ![](docs/images/05-arrival-popup.png) |
+
+시연 영상: [docs/demo/demo_parking_entrance.mp4](docs/demo/demo_parking_entrance.mp4) (에뮬레이터 화면, 입구 그림은 예시)
+
+이어서 작업하는 사람은 [HANDOFF.md](HANDOFF.md) 를 먼저 읽는다.
+
 ## 실행 방법
 
 1. 개발 환경 세팅: [docs/setup.md](docs/setup.md)
@@ -59,3 +67,7 @@
 ## APK
 
 `apk/` 폴더에 release 빌드를 올립니다.
+
+## 다음 단계
+
+빌트인 캠으로 입구 사진을 자동 수집하는 계획 등은 [docs/roadmap.md](docs/roadmap.md) 에 있다.

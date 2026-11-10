@@ -20,8 +20,8 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.viewModelScope
+import android.content.Context
+import com.lastmeter.parking.data.Entrance
 import com.lastmeter.parking.data.EntranceRepository
 import com.lastmeter.parking.data.Facility
 import com.lastmeter.parking.guidance.Fix
@@ -30,14 +30,24 @@ import com.lastmeter.parking.guidance.GuidanceEngine
 import com.lastmeter.parking.guidance.GuidanceEvent
 import com.lastmeter.parking.guidance.GuidanceState
 import com.lastmeter.parking.guidance.SpeechTexts
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Locale
 
 /**
  * Pleos SDK(위치·기어·내비·음성)와 AAOS 주행 제한 정보를 모아 GuidanceEngine에 넣고, 결과를 화면 상태와 음성으로 내보낸다.
+ *
+ * 화면(Activity)이 아니라 앱 프로세스에 하나만 둔다. 화면이 내려가거나 종료돼도
+ * GuidanceKeepAliveService 가 프로세스를 살려 두는 동안 안내(음성·도착 알림)가 이어진다.
  */
-class GuidanceViewModel(app: Application) : AndroidViewModel(app) {
+class GuidanceController private constructor(private val app: Application) {
+
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    private fun getApplication(): Application = app
+    private val prefs = app.getSharedPreferences("settings", Context.MODE_PRIVATE)
 
     private val main = Handler(Looper.getMainLooper())
     private val engine = GuidanceEngine()
@@ -60,6 +70,10 @@ class GuidanceViewModel(app: Application) : AndroidViewModel(app) {
     var naviDestinationName by mutableStateOf<String?>(null)
         private set
     var lastFeedback by mutableStateOf<String?>(null)
+        private set
+
+    /** 운전자가 넣어 둔 내 차 높이(m). 높이 제한에 걸리는 입구를 미리 경고하는 데 쓴다. 없으면 null */
+    var vehicleHeightM by mutableStateOf(prefs.getFloat(KEY_VEHICLE_HEIGHT, 0f).takeIf { it > 0f }?.toDouble())
         private set
 
     private var fused: FusedLocation? = null
@@ -91,6 +105,11 @@ class GuidanceViewModel(app: Application) : AndroidViewModel(app) {
         target = facility
         guidance = engine.state
         Log.i(TAG, "안내 대상: ${facility?.name}")
+        // 목적지가 있는 동안에만 백그라운드에서 깨어 있는다
+        runCatching {
+            if (facility != null) com.lastmeter.parking.GuidanceKeepAliveService.start(getApplication())
+            else com.lastmeter.parking.GuidanceKeepAliveService.stop(getApplication())
+        }.onFailure { Log.w(TAG, "백그라운드 유지 서비스 전환 실패: ${it.message}") }
     }
 
     /** 내비 목적지 좌표 근처(400m)에 입구 데이터가 있는 시설을 찾는다 */
@@ -107,6 +126,28 @@ class GuidanceViewModel(app: Application) : AndroidViewModel(app) {
             f.entrances.any { e -> Geo.distanceM(info.latitude, info.longitude, e.lat, e.lng) <= 400.0 }
         }
         if (match?.id != target?.id) applyTarget(match)
+    }
+
+    // ---------- 내 차 높이 ----------
+
+    /** 0.1m 단위로 올리고 내린다. 처음 누르면 승용차 기준 1.6m 에서 시작 */
+    fun changeVehicleHeight(deltaM: Double) {
+        val current = vehicleHeightM
+        val next = if (current == null) 1.6 else (Math.round((current + deltaM) * 10) / 10.0).coerceIn(1.2, 3.5)
+        vehicleHeightM = next
+        prefs.edit().putFloat(KEY_VEHICLE_HEIGHT, next.toFloat()).apply()
+    }
+
+    fun clearVehicleHeight() {
+        vehicleHeightM = null
+        prefs.edit().remove(KEY_VEHICLE_HEIGHT).apply()
+    }
+
+    /** 내 차가 이 입구의 높이 제한에 걸리는지 */
+    fun tooTallFor(entrance: Entrance): Boolean {
+        val mine = vehicleHeightM ?: return false
+        val limit = entrance.heightLimitM ?: return false
+        return mine >= limit
     }
 
     // ---------- 위치 (FusedLocation) ----------
@@ -146,7 +187,26 @@ class GuidanceViewModel(app: Application) : AndroidViewModel(app) {
         guidance = engine.state
         Log.d(TAG, "위치 ${"%.5f".format(fix.lat)},${"%.5f".format(fix.lng)} 상태=${guidance::class.simpleName} (이전 ${before::class.simpleName})")
         events.forEach(::speak)
+        val s = guidance
+        if (before is GuidanceState.Idle && s is GuidanceState.Approaching && !screenVisible) {
+            // 화면이 내려가 있으면(내비만 보일 때) 알림을 띄워 한 번 눌러 내비 옆에 열 수 있게 한다.
+            // 앱이 스스로 화면을 올리는 것은 시스템이 막는다 (BAL_BLOCK, docs/sdk-check.md 8절).
+            runCatching {
+                com.lastmeter.parking.ArrivalNotifier.show(
+                    getApplication(),
+                    title = "${s.facility.name} 주차장 입구",
+                    text = SpeechTexts.orderLine(s.entrance.roadSide, s.entrance.orderFromApproach) + " · " + s.entrance.landmark,
+                )
+            }.onFailure { Log.w(TAG, "도착 알림 실패: ${it.message}") }
+        }
     }
+
+    /** 앱 화면이 지금 보이는지 (MainActivity 가 알려 준다) */
+    var screenVisible = false
+        set(value) {
+            field = value
+            if (value) runCatching { com.lastmeter.parking.ArrivalNotifier.cancel(getApplication()) }
+        }
 
     // ---------- 기어 (Vehicle) ----------
 
@@ -160,7 +220,7 @@ class GuidanceViewModel(app: Application) : AndroidViewModel(app) {
             return
         }
         // 기어 변화 리스너를 확인하지 못해서 1초마다 조회한다 (docs/sdk-check.md 4절)
-        viewModelScope.launch {
+        scope.launch {
             while (true) {
                 readGear()
                 delay(1000)
@@ -266,7 +326,8 @@ class GuidanceViewModel(app: Application) : AndroidViewModel(app) {
 
     private fun speak(event: GuidanceEvent) {
         val text = when (event) {
-            is GuidanceEvent.SpeakPreview -> SpeechTexts.preview(event)
+            is GuidanceEvent.SpeakPreview ->
+                SpeechTexts.preview(event) + if (tooTallFor(event.entrance)) " " + SpeechTexts.tooTall(event.entrance.heightLimitM ?: 0.0) else ""
             is GuidanceEvent.SpeakConfuserWarning -> SpeechTexts.confuser(event)
             is GuidanceEvent.SpeakPassed -> SpeechTexts.passed()
         }
@@ -300,16 +361,25 @@ class GuidanceViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     @Suppress("DEPRECATION")
-    override fun onCleared() {
+    fun release() {
         runCatching { fused?.unregisterFusedLocationCallback(locationListener); fused?.release() }
         runCatching { vehicle?.release() }
         runCatching { navi?.removeListener(naviListener); navi?.release() }
         runCatching { tts?.release() }
         runCatching { uxManager?.unregisterListener(); car?.disconnect() }
-        super.onCleared()
+        instance = null
     }
 
     companion object {
         const val TAG = "Guidance"
+        private const val KEY_VEHICLE_HEIGHT = "vehicleHeightM"
+
+        @Volatile
+        private var instance: GuidanceController? = null
+
+        fun get(context: Context): GuidanceController =
+            instance ?: synchronized(this) {
+                instance ?: GuidanceController(context.applicationContext as Application).also { instance = it }
+            }
     }
 }

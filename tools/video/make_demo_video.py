@@ -23,38 +23,51 @@ BUILD.mkdir(parents=True, exist_ok=True)
 W, H, FPS = 1920, 1080, 30
 FONT_B = "C:/Windows/Fonts/malgunbd.ttf"
 FONT_R = "C:/Windows/Fonts/malgun.ttf"
-BG = (17, 20, 24)
-CARD = (30, 35, 42)
-WHITE = (255, 255, 255)
-SUB = (184, 192, 204)
-ACCENT = (255, 196, 0)
-WARN = (255, 107, 90)
+# 앱과 같은 Pleos 밝은 테마 색 (ui/PleosTheme.kt). WHITE 는 이름만 남은 "본문 글자색"이다
+BG = (247, 248, 250)
+CARD = (255, 255, 255)
+LINE = (224, 225, 230)
+WHITE = (19, 20, 23)
+ON_BLUE = (255, 255, 255)
+SUB = (104, 106, 114)
+ACCENT = (0, 100, 255)
+WARN = (254, 61, 22)
 ASSETS = Path(__file__).resolve().parents[2] / "app/src/main/assets/entrances"
 
 # 앱이 실제로 말하는 문장 (SpeechTexts.kt 와 같게)
+TALL = " 주의하세요. 높이 제한이 2.3미터라 이 차는 들어가기 어려워요."
 SPEECH = {
     "preview": "개발용 가상 상가 주차장 입구를 알려 드릴게요. 오른쪽, 편의점 바로 다음 경사로가 주차장 입구예요.",
+    "preview_tall": "개발용 가상 상가 주차장 입구를 알려 드릴게요. 오른쪽, 편의점 바로 다음 경사로가 주차장 입구예요." + TALL,
+    "preview_north_tall": "개발용 가상 상가 주차장 입구를 알려 드릴게요. 왼쪽, 약국을 지나서 바로 나오는 경사로가 주차장 입구예요." + TALL,
     "confuser": "첫 번째 경사로는 옆 건물 주차장이에요. 오른쪽 두 번째 경사로로 들어가세요.",
     "passed": "입구를 지나쳤어요. 내비가 다시 안내할 거예요.",
 }
 
 # (녹화 파일, 시작 초, 끝 초, 자막[(시작, 끝, 문장)], 음성[(시각, 키)])  시각은 잘라 낸 구간 기준
+# 2026-11-10 녹화 기준. 음성 시각은 녹화할 때 Logcat(Guidance 태그)에 찍힌 시각에서 가져왔다.
 CLIPS = [
-    ("demoA.mp4", 0.0, 50.0,
-     [(0.0, 4.0, "정차 중: 시연 목적지를 고르고, 앱을 내비 옆 칸에 띄워 둡니다"),
-      (4.0, 16.6, "D단 출발 · 앱이 Pleos 위치 SDK로 차 위치를 받습니다"),
-      (16.7, 37.7, "입구 300m 전: 입구 그림과 '오른쪽 · 두 번째 경사로'를 미리 보여 주고 음성으로 안내"),
-      (37.8, 50.0, "입구 바로 앞: 정면 그림 + '첫 번째 경사로는 옆 건물' 경고")],
-     [(16.8, "preview"), (37.9, "confuser")]),
-    ("demoC.mp4", 0.0, 12.2,
-     [(0.0, 4.0, "입구에 도착"),
-      (4.0, 12.2, "P단 → 주차 완료: 높이 제한 · 요금 · 운영 시간, 안내가 맞았는지 피드백")],
+    ("A.mp4", 12.0, 62.0,
+     [(0.0, 8.3, "D단 주행 중 · 앱은 내비 옆 칸에서 기다립니다"),
+      (8.4, 39.9, "입구 300m 전: 방향 카드 · 경사로 약도 · 높이 제한 · 입구 그림을 미리 보여 주고 음성 안내"),
+      (40.0, 50.0, "입구 바로 앞: 정면 그림 + '첫 번째 경사로는 옆 건물' 경고")],
+     [(8.4, "preview"), (40.0, "confuser")]),
+    ("A.mp4", 70.0, 82.4,
+     [(0.0, 5.5, "입구에 도착"),
+      (5.6, 12.4, "P단 → 주차 완료: 주차장 정보 · 피드백 · 다음 단계(빌트인 캠) 안내")],
      []),
-    ("demoB.mp4", 22.0, 46.0,
-     [(0.0, 5.0, "다른 경우: 입구를 지나칠 때"),
-      (5.0, 15.4, "입구 앞 경고"),
-      (15.5, 24.0, "입구에서 멀어지면 '지나쳤어요' 알림 → 길 찾기는 내비가 다시 합니다")],
-     [(5.2, "confuser"), (15.6, "passed")]),
+    ("B.mp4", 0.0, 38.0,
+     [(0.0, 4.2, "다른 경우: 입구를 지나칠 때"),
+      (4.3, 13.3, "입구 미리 보기"),
+      (13.4, 27.6, "입구 앞 경고"),
+      (27.7, 38.0, "입구에서 멀어지면 '지나쳤어요' 알림 → 길 찾기는 내비가 다시 합니다")],
+     [(4.3, "preview"), (13.4, "confuser"), (27.7, "passed")]),
+    ("C.mp4", 0.0, 48.0,
+     [(0.0, 11.0, "추가 기능 ① 내 차 높이를 넣어 둡니다 (정차 중에만 보이는 설정)"),
+      (11.0, 23.2, "② 북쪽에서 오면 그쪽 입구로 안내 · 높이 제한에 걸리면 경고"),
+      (23.3, 34.3, "③ 남쪽에서 오면 원래 입구 · 경사로 약도와 높이 경고"),
+      (34.4, 48.0, "④ 밤 모드: 화면과 입구 그림이 밤 버전으로 바뀝니다")],
+     [(14.3, "preview_north_tall"), (28.4, "preview_tall"), (40.9, "confuser")]),
 ]
 
 
@@ -112,28 +125,28 @@ def s_problem(img, d):
 
 def s_layout(img, d):
     boxes = [
-        (120, "차량 정보", "Pleos 고정 영역", (60, 66, 76)),
-        (700, "주차장 입구 안내", "우리 앱", (120, 92, 0)),
-        (1280, "순정 내비", "길 안내", (40, 70, 110)),
+        (120, "차량 정보", "Pleos 고정 영역", False),
+        (700, "주차장 입구 안내", "우리 앱", True),
+        (1280, "순정 내비", "길 안내", False),
     ]
-    for x, t, s, c in boxes:
-        d.rounded_rectangle([x, 240, x + 520, 720], radius=24, fill=c)
-        d.text((x + 40, 420), t, font=font(48), fill=WHITE)
-        d.text((x + 40, 500), s, font=font(36, False), fill=SUB)
-    d.text((120, 790), "Pleos 분할 화면: 출발 전에 우리 앱을 내비 옆 칸에 띄워 둡니다", font=font(40), fill=WHITE)
+    for x, t, s, ours in boxes:
+        d.rounded_rectangle([x, 240, x + 520, 720], radius=24, fill=ACCENT if ours else CARD, outline=None if ours else LINE, width=2)
+        d.text((x + 40, 420), t, font=font(48), fill=ON_BLUE if ours else WHITE)
+        d.text((x + 40, 500), s, font=font(36, False), fill=ON_BLUE if ours else SUB)
+    d.text((120, 790), "Pleos 분할 화면: 우리 앱을 내비 옆 칸에 두면 도착 직전에 입구 안내로 바뀝니다", font=font(40), fill=WHITE)
     d.text((120, 860), "길 안내는 내비가, 입구 확인은 우리 앱이 맡습니다 (경로 안내는 내비 하나만 하는 Pleos 정책)", font=font(34, False), fill=SUB)
 
 
 def s_flow(img, d):
     steps = [
-        ("① 입구 300m 전", "입구 그림 + '오른쪽 · 두 번째 경사로'", "미리 보여 주고 음성 안내"),
-        ("② 입구 바로 앞", "정면 그림", "옆 건물 입구 경고"),
+        ("① 입구 300m 전", "입구 그림 + 경사로 약도", "높이 제한 · 음성 안내"),
+        ("② 입구 바로 앞", "정면 그림 + 약도", "옆 건물 입구 경고"),
         ("③ 지나치면", "바로 알림", "길 찾기는 내비가 다시"),
         ("④ P단", "주차 완료 · 주차장 정보", "입구가 맞았는지 피드백"),
     ]
     x = 100
     for i, (h, a, b) in enumerate(steps):
-        d.rounded_rectangle([x, 300, x + 400, 720], radius=24, fill=CARD)
+        d.rounded_rectangle([x, 300, x + 400, 720], radius=24, fill=CARD, outline=LINE, width=2)
         d.text((x + 30, 340), h, font=font(42), fill=ACCENT)
         for k, line in enumerate(text_wrap(d, a, font(32, False), 340) + text_wrap(d, b, font(32, False), 340)):
             d.text((x + 30, 440 + k * 56), line, font=font(32, False), fill=WHITE)
@@ -153,24 +166,24 @@ def s_sdk(img, d):
     ]
     y = 250
     for a, b in rows:
-        d.rounded_rectangle([120, y, 1800, y + 120], radius=18, fill=CARD)
+        d.rounded_rectangle([120, y, 1800, y + 120], radius=18, fill=CARD, outline=LINE, width=2)
         d.text((160, y + 32), a, font=font(44), fill=ACCENT)
         d.text((900, y + 36), b, font=font(40, False), fill=WHITE)
         y += 145
 
 
 def s_arch(img, d):
-    chain = ["Pleos SDK", "ViewModel", "판단 로직\nGuidanceEngine", "화면 · 음성"]
+    chain = ["Pleos SDK", "Controller", "판단 로직\nGuidanceEngine", "화면 · 음성"]
     x = 100
     for i, c in enumerate(chain):
-        d.rounded_rectangle([x, 280, x + 380, 500], radius=24, fill=CARD if i != 2 else (120, 92, 0))
+        d.rounded_rectangle([x, 280, x + 380, 500], radius=24, fill=CARD if i != 2 else ACCENT, outline=LINE if i != 2 else None, width=2)
         for k, line in enumerate(c.split("\n")):
             f = font(42) if k == 0 else font(32, False)
-            d.text((x + 30, 330 + k * 64), line, font=f, fill=WHITE)
+            d.text((x + 30, 330 + k * 64), line, font=f, fill=WHITE if i != 2 else ON_BLUE)
         if i < 3:
             d.text((x + 392, 350), "→", font=font(56), fill=SUB)
         x += 460
-    d.text((120, 580), "판단 로직은 SDK와 분리한 순수 코틀린 · 단위 테스트 8개", font=font(40), fill=WHITE)
+    d.text((120, 580), "판단 로직은 SDK와 분리한 순수 코틀린 · 단위 테스트 9개", font=font(40), fill=WHITE)
     d.text((120, 660), "GPS 오차를 전제로: 좌표 대신 '몇 번째 경사로'와 간판처럼 눈에 보이는 단서로 안내", font=font(36, False), fill=SUB)
 
 
@@ -182,8 +195,9 @@ def s_section(img, d):
 def s_outro(img, d):
     items = [
         "실제 장소 입구 사진 · 좌표 수집 중 (예시 그림 교체)",
-        "주행 데이터로 입구 좌표 자동 학습 (설계 완료)",
-        "실차 검증과 입구 데이터 확대 계획",
+        "빌트인 캠으로 입구 사진 자동 수집 (영상 API가 열리면)",
+        "사용자 피드백으로 입구 데이터 고치기 · 출구 안내",
+        "실차 검증과 입구 데이터 확대",
     ]
     y = 300
     for t in items:

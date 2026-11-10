@@ -78,3 +78,11 @@ Pleos Connect 에뮬레이터 v2.1.0에서 앱의 "SDK 점검판" 화면으로 �
 2. 사용 방법은 "출발 전 정차 중에 우리 앱을 내비 옆 칸에 띄워 두기"로 안내한다. 기본 둘째 칸이 미디어라, 미디어 대신 우리 앱을 두는 셈이다.
 3. 우리 앱이 화면에 없을 때도 음성 안내는 뒤에서 나가게 한다(화면은 못 띄워도 소리는 가능).
 4. 음성 안내 문구는 화살표·턴 안내가 아니라 "편의점 옆 경사로" 같은 입구 설명으로 한다. 내비 외 앱의 경로 안내는 단일 경로 정책에 걸릴 수 있다.
+
+## 8. 화면이 내려가 있을 때 (내비만 보일 때) 동작 — 2026-11-10 에뮬레이터 확인
+
+- 앱 화면이 내려가면 시스템이 프로세스를 멈춘다(`isFrozen=true`). 위치 콜백도 끊긴다. → 포그라운드 서비스(`GuidanceKeepAliveService`, specialUse)를 켜 두면 백그라운드에서도 위치를 계속 받고 음성 안내가 나간다.
+- 앱이 스스로 화면을 올리는 것은 막힌다. 포그라운드 서비스 상태에서 `startActivity` → `Background activity launch blocked (BAL_BLOCK)`.
+- 대신 알림은 내비 위에 팝업으로 뜬다(중요도 HIGH, `CATEGORY_NAVIGATION`). 누르면 앱이 열린다. 단, 알림 권한(`POST_NOTIFICATIONS`)을 사용자 10에게 받아야 한다.
+- 알림을 눌러 열린 앱은 직전 앱과 같은 방향으로 뜬다. 내비가 두 칸(가로형)이었으면 우리 앱도 두 칸으로 떠서 내비를 가린다. 내비와 나란히 보려면 미리 창을 나눠 둬야 한다(창 막대 드래그). 근거: https://document.pleos.ai/en/docs/connect/guide/docs-design/getting-started/window
+- 색·글꼴 규칙 출처: https://document.pleos.ai/en/docs/connect/guide/docs-design/foundations/colors , https://document.pleos.ai/en/docs/connect/guide/docs-design/foundations/typography

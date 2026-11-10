@@ -1,5 +1,6 @@
 package com.lastmeter.parking
 
+import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -21,11 +22,12 @@ import androidx.core.content.ContextCompat
 import com.lastmeter.parking.check.SdkCheckScreen
 import com.lastmeter.parking.check.SdkCheckViewModel
 import com.lastmeter.parking.ui.GuidanceScreen
-import com.lastmeter.parking.ui.GuidanceViewModel
+import com.lastmeter.parking.ui.GuidanceController
+import com.lastmeter.parking.ui.PleosTheme
 
 class MainActivity : ComponentActivity() {
 
-    private val guidanceViewModel: GuidanceViewModel by viewModels()
+    private val guidanceViewModel: GuidanceController get() = GuidanceController.get(this)
     private val checkViewModel: SdkCheckViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,9 +43,19 @@ class MainActivity : ComponentActivity() {
                 checkViewModel.log("LOC", "FUSED_LOCATION 권한 결과=$granted")
             }
 
+            // 처음 실행할 때 위치와 알림 권한을 한 번에 묻는다. 알림은 화면이 내려가 있을 때 도착 팝업에 쓴다
+            val startupPermissions = rememberLauncherForActivityResult(
+                ActivityResultContracts.RequestMultiplePermissions()
+            ) { result ->
+                guidanceViewModel.onLocationPermission(result[FUSED_LOCATION_PERMISSION] == true || hasLocationPermission())
+            }
+
             LaunchedEffect(Unit) {
                 if (hasLocationPermission()) guidanceViewModel.onLocationPermission(true)
-                else permissionLauncher.launch(FUSED_LOCATION_PERMISSION)
+                val missing = listOf(FUSED_LOCATION_PERMISSION, Manifest.permission.POST_NOTIFICATIONS).filter {
+                    ContextCompat.checkSelfPermission(this@MainActivity, it) != PackageManager.PERMISSION_GRANTED
+                }
+                if (missing.isNotEmpty()) startupPermissions.launch(missing.toTypedArray())
             }
 
             BackHandler(enabled = showCheck) { showCheck = false }
@@ -56,15 +68,27 @@ class MainActivity : ComponentActivity() {
                             onRequestLocationPermission = { permissionLauncher.launch(FUSED_LOCATION_PERMISSION) },
                         )
                     } else {
-                        GuidanceScreen(
-                            vm = guidanceViewModel,
-                            onRequestLocationPermission = { permissionLauncher.launch(FUSED_LOCATION_PERMISSION) },
-                            onOpenSdkCheck = { showCheck = true },
-                        )
+                        PleosTheme {
+                            GuidanceScreen(
+                                vm = guidanceViewModel,
+                                onRequestLocationPermission = { permissionLauncher.launch(FUSED_LOCATION_PERMISSION) },
+                                onOpenSdkCheck = { showCheck = true },
+                            )
+                        }
                     }
                 }
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        guidanceViewModel.screenVisible = true
+    }
+
+    override fun onStop() {
+        guidanceViewModel.screenVisible = false
+        super.onStop()
     }
 
     private fun hasLocationPermission(): Boolean =

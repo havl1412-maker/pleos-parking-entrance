@@ -45,6 +45,8 @@ class EntranceRepository(private val context: Context) {
                                     lng = c.getDouble("lng"),
                                 )
                             },
+                            photoFarNight = e.optNullableString("photoFarNight"),
+                            photoNearNight = e.optNullableString("photoNearNight"),
                         )
                     },
                 )

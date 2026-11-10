@@ -17,6 +17,10 @@
     <uses-permission android:name="pleos.car.permission.FUSED_LOCATION" />
     <!-- 음성 안내 -->
     <uses-permission android:name="pleos.car.permission.TTS_SERVICE" />
+    <!-- 화면이 내려가 있을 때도 입구 접근을 알아채기 위한 포그라운드 서비스 -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:allowBackup="false"
@@ -37,6 +41,16 @@
                 android:name="distractionOptimized"
                 android:value="true" />
         </activity>
+
+        <!-- 화면이 내려가 있어도 위치를 계속 받기 위한 서비스 (목적지가 정해진 동안만 실행) -->
+        <service
+            android:name=".GuidanceKeepAliveService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="목적지 근처에서 주차장 입구 안내를 띄우기 위한 차량 위치 감시" />
+        </service>
     </application>
 
 </manifest>

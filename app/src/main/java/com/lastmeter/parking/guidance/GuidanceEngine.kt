@@ -64,22 +64,61 @@ class GuidanceEngine(private val config: Config = Config()) {
     private var previewSpoken = false
     private var confuserSpoken = false
     private var passedSpoken = false
+    /** 들어갈 수 있는 입구들. 300m 안에 들어설 때 진입 방향에 맞는 하나로 정한다 */
+    private var candidates: List<Entrance> = emptyList()
+    private var entranceLocked = false
+    /** 진행 방향 계산용: 이 위치에서 15m 이상 움직였을 때의 방위를 진행 방향으로 본다 (GPS 떨림 무시) */
+    private var bearingAnchor: Fix? = null
+    private var travelBearingDeg: Double? = null
 
-    /** 안내할 목적지 시설을 정한다. 들어가는 입구 중 첫 번째를 대상으로 한다 */
+    /** 안내할 목적지 시설을 정한다. 어느 입구로 안내할지는 가까워질 때 진입 방향을 보고 정한다 */
     fun setTarget(target: Facility?) {
         facility = target
-        entrance = target?.entrances?.firstOrNull { it.canEnter }
+        candidates = target?.entrances?.filter { it.canEnter }.orEmpty()
+        entrance = candidates.firstOrNull()
+        bearingAnchor = null
+        travelBearingDeg = null
         resetProgress()
         state = GuidanceState.Idle
+    }
+
+    private fun updateTravelBearing(fix: Fix) {
+        val anchor = bearingAnchor
+        if (anchor == null) {
+            bearingAnchor = fix
+        } else if (Geo.distanceM(anchor.lat, anchor.lng, fix.lat, fix.lng) >= 15.0) {
+            travelBearingDeg = Geo.bearingDeg(anchor.lat, anchor.lng, fix.lat, fix.lng)
+            bearingAnchor = fix
+        }
+    }
+
+    /**
+     * 아직 입구를 정하지 않았으면 가장 가까운 입구를 기준으로 거리를 재고,
+     * 300m 안에 들어서는 순간 "지금 달리는 방향"과 주 접근 방향이 가장 잘 맞는 입구로 정한다.
+     */
+    private fun pickEntrance(fix: Fix): Entrance? {
+        if (entranceLocked || candidates.size <= 1) return entrance
+        val nearest = candidates.minByOrNull { Geo.distanceM(fix.lat, fix.lng, it.lat, it.lng) } ?: return null
+        if (Geo.distanceM(fix.lat, fix.lng, nearest.lat, nearest.lng) > config.approachM) return nearest
+        val heading = travelBearingDeg
+        val chosen = if (heading == null) nearest else {
+            candidates
+                .filter { Geo.distanceM(fix.lat, fix.lng, it.lat, it.lng) <= config.resetM }
+                .minByOrNull { kotlin.math.abs(Geo.angleDiffDeg(heading, it.approachBearingDeg)) } ?: nearest
+        }
+        entranceLocked = true
+        return chosen
     }
 
     val target: Facility? get() = facility
 
     fun onFix(fix: Fix): List<GuidanceEvent> {
         lastFix = fix
+        updateTravelBearing(fix)
         val f = facility ?: return emptyList()
-        val e = entrance ?: return emptyList()
         if (state is GuidanceState.Parked) return emptyList()
+        val e = pickEntrance(fix) ?: return emptyList()
+        entrance = e
 
         val d = Geo.distanceM(fix.lat, fix.lng, e.lat, e.lng)
         val events = mutableListOf<GuidanceEvent>()
@@ -139,6 +178,7 @@ class GuidanceEngine(private val config: Config = Config()) {
     }
 
     private fun resetProgress() {
+        entranceLocked = false
         minDistanceM = Double.MAX_VALUE
         previewSpoken = false
         confuserSpoken = false

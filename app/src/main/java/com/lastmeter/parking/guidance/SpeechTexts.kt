@@ -18,6 +18,8 @@ object SpeechTexts {
 
     fun passed(): String = "입구를 지나쳤어요. 내비가 다시 안내할 거예요."
 
+    fun tooTall(limitM: Double): String = "주의하세요. 높이 제한이 ${limitM}미터라 이 차는 들어가기 어려워요."
+
     fun sideKo(side: RoadSide): String = if (side == RoadSide.RIGHT) "오른쪽" else "왼쪽"
 
     fun orderLine(side: RoadSide, order: Int): String =

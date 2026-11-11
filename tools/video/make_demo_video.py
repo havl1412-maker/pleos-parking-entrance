@@ -101,8 +101,8 @@ def slide(name, title, draw_body):
 
 
 def s_title(img, d):
-    d.text((120, 330), "주차장 입구 안내", font=font(110), fill=WHITE)
-    d.text((120, 480), "(가칭)", font=font(48, False), fill=SUB)
+    d.text((120, 330), "마지막300M", font=font(110), fill=WHITE)
+    d.text((120, 480), "주차장 입구 안내 앱", font=font(48, False), fill=SUB)
     d.text((120, 580), "도착 직전, 붙어 있는 경사로 중 진짜 입구를 알려 주는 Pleos Connect 차량용 앱", font=font(44, False), fill=SUB)
     d.text((120, 900), "현대자동차그룹 차량용 앱 개발 공모전 · Pleos Connect 에뮬레이터 시연", font=font(32, False), fill=SUB)
 
@@ -126,7 +126,7 @@ def s_problem(img, d):
 def s_layout(img, d):
     boxes = [
         (120, "차량 정보", "Pleos 고정 영역", False),
-        (700, "주차장 입구 안내", "우리 앱", True),
+        (700, "마지막300M", "우리 앱", True),
         (1280, "순정 내비", "길 안내", False),
     ]
     for x, t, s, ours in boxes:

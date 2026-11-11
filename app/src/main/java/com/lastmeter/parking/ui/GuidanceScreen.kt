@@ -260,7 +260,7 @@ private fun IdleScreen(vm: GuidanceController, onRequestLocationPermission: () -
         verticalArrangement = Arrangement.spacedBy(Gap),
     ) {
         val t = vm.target
-        Header(label = "주차장 입구 안내", title = if (t != null) t.name else "목적지를 기다리는 중")
+        Header(label = "마지막300M · 주차장 입구 안내", title = if (t != null) t.name else "목적지를 기다리는 중")
         Card {
             Text(
                 if (t != null) "입구에 닿기 30초쯤 전에 사진과 함께 알려 드릴게요" else "내비 목적지 근처에 오면 주차장 입구를 알려 드려요",

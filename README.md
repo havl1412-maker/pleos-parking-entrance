@@ -1,4 +1,6 @@
-# 주차장 입구 안내 (가칭)
+# 마지막300M
+
+팀 둠 · 주차장 입구 안내 앱
 
 상가가 밀집한 곳에서 내비가 목적지 근처까지 데려다줘도, 붙어 있는 경사로 중 어느 것이 진짜 주차장 입구인지 헷갈리는 순간을 돕는 Pleos Connect 차량용 앱입니다. 도착 직전에 실제 입구 사진, 옆 건물 입구와 헷갈림 경고, 큰 화살표와 음성으로 "어느 입구로 들어가야 하는지"를 알려 줍니다.
 
@@ -81,12 +83,12 @@
 
 ## APK
 
-[apk/Team_ParkingEntrance_release.apk](apk/Team_ParkingEntrance_release.apk) (release 빌드, v3 서명, 파일명은 임시로 팀명·앱 이름이 정해지면 바뀝니다)
+[apk/둠_마지막300M_release.apk](apk/%EB%91%A0_%EB%A7%88%EC%A7%80%EB%A7%89300M_release.apk) (팀명 둠 · 앱 이름 마지막300M, release 빌드, v3 서명)
 
 설치 (에뮬레이터 사용자 10):
 
 ```
-adb install apk/Team_ParkingEntrance_release.apk
+adb install apk/둠_마지막300M_release.apk
 adb shell pm grant --user 10 com.lastmeter.parking pleos.car.permission.FUSED_LOCATION
 adb shell pm grant --user 10 com.lastmeter.parking android.permission.POST_NOTIFICATIONS
 ```

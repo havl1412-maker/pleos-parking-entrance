@@ -32,3 +32,8 @@ adb forward tcp:8088 tcp:8088
 - minSdk는 28 이상 (보안 요구사항)
 - 에뮬레이터 부팅이 끝난 뒤 앱 실행
 - 블라인드 심사: README, 커밋 메시지, 코드 주석에 실명·학교·동아리 이름을 쓰지 않는다
+
+## 문제 해결
+- **내비가 "서비스 연결 중"에서 안 넘어감**: 에뮬레이터가 DNS를 못 찾는 경우다(`adb shell ping google.com` 이 `unknown host`). `tools/start-emulator.ps1` 로 켜면 `-dns-server 8.8.8.8,1.1.1.1` 을 붙여 켜고 Virtual Console 포트도 연결한다.
+- **`adb` 명령을 못 찾음**: `%LOCALAPPDATA%\Android\Sdk\platform-tools` 를 사용자 PATH 에 추가하고 터미널을 새로 연다.
+- **빌드 시 `Invalid file path`**: `local.properties` 의 역슬래시가 하나씩만 들어간 경우. `sdk.dir=C\:\\Users\\<이름>\\AppData\\Local\\Android\\Sdk` 처럼 두 번씩 쓴다.

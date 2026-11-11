@@ -51,7 +51,8 @@
 | 경로 | 역할 |
 |---|---|
 | `guidance/GuidanceEngine.kt` | 안내 판단 로직(순수 코틀린, 단위 테스트 있음) |
-| `ui/GuidanceViewModel.kt` | Pleos SDK(위치·기어·내비·음성)와 주행 제한 정보를 엔진에 연결 |
+| `ui/GuidanceController.kt` | Pleos SDK(위치·기어·내비·음성)와 주행 제한 정보를 엔진에 연결. 화면이 내려가도 이어지도록 앱 프로세스에 하나만 둔다 |
+| `GuidanceKeepAliveService.kt`, `ArrivalNotifier.kt` | 화면이 내려가 있을 때도 위치를 받고, 입구 300m 전에 도착 알림을 띄운다 |
 | `ui/GuidanceScreen.kt` | 주행 중 화면 (큰 글씨, 고대비, 주행 중 버튼 숨김) |
 | `data/` , `assets/entrances.json` | 입구 데이터. 수집 방법: [docs/data-collection.md](docs/data-collection.md) |
 | `check/` | SDK 점검판 (개발용). 결과: [docs/sdk-check.md](docs/sdk-check.md) |

@@ -86,3 +86,10 @@ Pleos Connect 에뮬레이터 v2.1.0에서 앱의 "SDK 점검판" 화면으로 �
 - 대신 알림은 내비 위에 팝업으로 뜬다(중요도 HIGH, `CATEGORY_NAVIGATION`). 누르면 앱이 열린다. 단, 알림 권한(`POST_NOTIFICATIONS`)을 사용자 10에게 받아야 한다.
 - 알림을 눌러 열린 앱은 직전 앱과 같은 방향으로 뜬다. 내비가 두 칸(가로형)이었으면 우리 앱도 두 칸으로 떠서 내비를 가린다. 내비와 나란히 보려면 미리 창을 나눠 둬야 한다(창 막대 드래그). 근거: https://document.pleos.ai/en/docs/connect/guide/docs-design/getting-started/window
 - 색·글꼴 규칙 출처: https://document.pleos.ai/en/docs/connect/guide/docs-design/foundations/colors , https://document.pleos.ai/en/docs/connect/guide/docs-design/foundations/typography
+
+## 9. 화면 뒤에서 목적지가 정해질 때 — 2026-11-11 에뮬레이터 확인
+
+- 내비에서 목적지를 정하면 순정 내비가 앞으로 나오고 우리 앱은 뒤로 간다. 이때 `onDestinationInfo` 를 받아 포그라운드 서비스를 켜려 하면 `startForegroundService() not allowed due to mAllowStartForeground false` 로 막힌다(안드로이드 12+ 백그라운드 시작 제한).
+- 해결: 앱 화면이 보일 때(`onStart`) 서비스를 켜 두고, 목적지가 없어져도 끄지 않는다(`GuidanceController.ensureKeepAlive`).
+- 결과: 우리 앱이 뒤에 있는 상태에서 내비 목적지 → 안내 대상 자동 선택 → 300m 전 음성 → 입구 앞 옆 건물 경고 음성 → 내비 위 도착 알림까지 동작했다. 프로세스는 `curProcState=4`(포그라운드 서비스), `isFrozen=false`.
+- 함께 고친 것: `GuidanceController` 의 `init` 블록이 `naviListener` 선언보다 앞에 있어 `NaviHelper.addListener(null)` 로 내비 연동이 조용히 실패하고 있었다(11/10 구조 변경 때 생김). `init` 을 클래스 끝으로 옮겼다.

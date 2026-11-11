@@ -31,7 +31,9 @@ SDK 별 확인 결과와 함정은 [docs/sdk-check.md](docs/sdk-check.md) 에 �
 - 내비가 아닌 앱은 "몇 m 앞 우회전" 같은 경로 안내를 하면 안 된다(단일 경로 정책).
 - 블라인드 심사: 저장소·README·커밋·영상·기획서에 실명·학교·동아리 이름을 쓰지 않는다.
 - Virtual Console 의 큰 "Drive" 버튼은 누르지 않는다(위치가 저절로 움직인다). 기어는 Emulation Controls > Gear Selection 으로 바꾼다.
-- 알림 권한 요청 창이 실제로 뜨는지, 화면이 완전히 종료된 뒤에도 안내가 이어지는지는 아직 직접 확인하지 못했다.
+- 백그라운드 유지 서비스는 **앱 화면이 보일 때** 켠다. 내비에서 목적지를 정하면 우리 앱은 뒤로 가는데, 안드로이드는 화면 뒤에 있는 앱의 포그라운드 서비스 시작을 막는다(`startForegroundService() not allowed`). 그래서 앱을 한 번 열면 서비스가 켜지고, 목적지가 없어져도 끄지 않는다. 알림 줄에 "주차장 입구 안내 대기 중"이 계속 보이는 것은 정상이다.
+- 11/11 확인: 내비만 보이는 상태(우리 앱은 뒤)에서 내비 목적지 → 자동으로 안내 대상 선택 → 300m 전 음성, 입구 앞 옆 건물 경고 음성, 내비 위 도착 알림까지 동작.
+- 알림 권한 요청 창이 실제로 뜨는지, 앱을 강제 종료한 뒤에도 안내가 이어지는지는 아직 직접 확인하지 못했다.
 
 ## 4. 남은 일 (우선순위 순)
 
@@ -60,6 +62,9 @@ adb shell pm grant --user 10 com.lastmeter.parking pleos.car.permission.FUSED_LO
 adb shell pm grant --user 10 com.lastmeter.parking android.permission.POST_NOTIFICATIONS
 adb forward tcp:8088 tcp:8088
 ```
+
+7. `adb` 가 안 찾아지면 `%LOCALAPPDATA%\Android\Sdk\platform-tools` 를 사용자 PATH 에 넣는다. `tools/demo-drive.ps1` 도 `adb` 를 PATH 에서 찾는다.
+8. 내비가 "서비스 연결 중"에서 멈추면 에뮬레이터가 DNS 를 못 찾는 것이다(11/11 노트북에서 발생, IP 로는 인터넷이 됨). `tools/start-emulator.ps1` 로 켜면 DNS 서버를 지정해서 켠다. Device Manager 의 실행 버튼으로 켜면 이 옵션이 빠진다.
 
 ## 6. 시연 돌리는 법
 

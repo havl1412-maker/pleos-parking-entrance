@@ -86,13 +86,6 @@ class GuidanceController private constructor(private val app: Application) {
     /** 사용자가 시연용으로 목적지를 직접 고른 경우, 내비 목적지로 덮어쓰지 않는다 */
     private var manualTarget = false
 
-    init {
-        startTts()
-        startVehicle()
-        startNavi()
-        startUxRestrictions()
-    }
-
     // ---------- 목적지 ----------
 
     fun selectDemoTarget(facility: Facility?) {
@@ -105,11 +98,22 @@ class GuidanceController private constructor(private val app: Application) {
         target = facility
         guidance = engine.state
         Log.i(TAG, "안내 대상: ${facility?.name}")
-        // 목적지가 있는 동안에만 백그라운드에서 깨어 있는다
-        runCatching {
-            if (facility != null) com.lastmeter.parking.GuidanceKeepAliveService.start(getApplication())
-            else com.lastmeter.parking.GuidanceKeepAliveService.stop(getApplication())
-        }.onFailure { Log.w(TAG, "백그라운드 유지 서비스 전환 실패: ${it.message}") }
+        if (facility != null) ensureKeepAlive()
+    }
+
+    /** 백그라운드 유지 서비스가 켜져 있는지 */
+    private var keepAliveOn = false
+
+    /**
+     * 백그라운드 유지 서비스를 켠다. 안드로이드 12+ 는 앱이 화면 뒤에 있을 때 포그라운드 서비스 시작을 막으므로
+     * (내비에서 목적지를 정하면 우리 앱은 뒤로 간다), 앱 화면이 보일 때 미리 켜 두고 목적지가 없어져도 끄지 않는다.
+     * 2026-11-11 에뮬레이터: 화면 뒤에서 시작하면 "startForegroundService() not allowed" 로 실패하는 것 확인.
+     */
+    private fun ensureKeepAlive() {
+        if (keepAliveOn) return
+        runCatching { com.lastmeter.parking.GuidanceKeepAliveService.start(getApplication()) }
+            .onSuccess { keepAliveOn = true; Log.i(TAG, "백그라운드 유지 서비스 켬") }
+            .onFailure { Log.w(TAG, "백그라운드 유지 서비스 시작 실패: ${it.message}") }
     }
 
     /** 내비 목적지 좌표 근처(400m)에 입구 데이터가 있는 시설을 찾는다 */
@@ -205,7 +209,11 @@ class GuidanceController private constructor(private val app: Application) {
     var screenVisible = false
         set(value) {
             field = value
-            if (value) runCatching { com.lastmeter.parking.ArrivalNotifier.cancel(getApplication()) }
+            if (value) {
+                runCatching { com.lastmeter.parking.ArrivalNotifier.cancel(getApplication()) }
+                // 화면이 보일 때만 포그라운드 서비스를 시작할 수 있다
+                ensureKeepAlive()
+            }
         }
 
     // ---------- 기어 (Vehicle) ----------
@@ -367,7 +375,18 @@ class GuidanceController private constructor(private val app: Application) {
         runCatching { navi?.removeListener(naviListener); navi?.release() }
         runCatching { tts?.release() }
         runCatching { uxManager?.unregisterListener(); car?.disconnect() }
+        runCatching { com.lastmeter.parking.GuidanceKeepAliveService.stop(getApplication()) }
+        keepAliveOn = false
         instance = null
+    }
+
+    // 클래스 맨 끝에 둔다. 코틀린은 속성을 위에서부터 초기화하므로, 앞에 두면 naviListener 등이 아직 null 이라
+    // NaviHelper.addListener(null) 로 내비 연동이 조용히 실패한다 (2026-11-11 노트북 에뮬레이터에서 발견).
+    init {
+        startTts()
+        startVehicle()
+        startNavi()
+        startUxRestrictions()
     }
 
     companion object {

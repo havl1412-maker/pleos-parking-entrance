@@ -27,6 +27,8 @@ LEFT_LINE = -12.0            # 맞은편 건물 벽
 RAMP_TOP = 2.6               # 경사로 입구 높이
 RAMP1 = (9.8, 14.0)          # 옆 건물 경사로 (첫 번째)
 RAMP2 = (19.0, 24.5)         # 목적지 경사로 (두 번째, 편의점 바로 다음)
+RAMP3 = (35.5, 40.5)         # 다음 건물 경사로 (지나치면 나오는 헷갈리는 입구)
+RAMPS = (RAMP1, RAMP2, RAMP3)
 
 
 def font(size, bold=True):
@@ -174,7 +176,7 @@ def build_world():
     f.windows(2.4, 14.2, 4.4, 13.2, 6, 3, (120, 118, 114), (150, 172, 192), 0.3, 1)
     f.rect(2.0, 14.5, 13.3, 14.0, (140, 136, 130))
     f.rect(3.2, 8.4, 0, 3.1, (110, 140, 165), lit=120)          # 로비 유리
-    ramp_facade(f, RAMP1, "△△빌딩 주차장", (60, 60, 60), 0)
+    ramp_facade(f, RAMP1, "△△빌딩 주차장", (60, 60, 60), 255)  # 밤에는 옆 건물 간판도 켜져 있어 더 헷갈린다
     rf.append(f)
     # 편의점 (경사로 사이, 낮은 건물)
     f = Facade(BUILDING_LINE, 14.5, 18.6, 4.8, (236, 236, 230))
@@ -183,20 +185,28 @@ def build_world():
     f.rect(14.9, 18.2, 0, 2.9, (170, 205, 220), lit=255, outline=(90, 90, 90), width=4)
     rf.append(f)
     # ② 목적지 ○○프라자 (두 번째 경사로)
-    f = Facade(BUILDING_LINE, 18.6, 46, 20, (214, 196, 168))
-    f.windows(19, 45.5, 5.2, 18.6, 9, 4, (160, 140, 110), (150, 172, 192), 0.35, 2)
-    f.rect(18.6, 46, 18.8, 20, (190, 170, 140))
-    f.text(32, 19.4, "○○프라자", 1.0, (80, 60, 40))
+    f = Facade(BUILDING_LINE, 18.6, 34, 20, (214, 196, 168))
+    f.windows(19, 33.5, 5.2, 18.6, 5, 4, (160, 140, 110), (150, 172, 192), 0.35, 2)
+    f.rect(18.6, 34, 18.8, 20, (190, 170, 140))
+    f.text(26.3, 19.4, "○○프라자", 1.0, (80, 60, 40))
     ramp_facade(f, RAMP2, "P 주차장 입구", (20, 90, 200), 255)
     f.d.ellipse(f.box(25.0, 26.5, 1.0, 2.5), fill=(255, 255, 255), outline=(220, 30, 30), width=int(0.16 * PPM))  # 높이 제한 표지
     f.ld.ellipse(f.box(25.0, 26.5, 1.0, 2.5), fill=160)
     f.text(25.75, 1.75, "2.3m", 0.42, (0, 0, 0))
     f.rect(25.0, 27.6, 0.15, 0.85, (30, 60, 120), lit=140, radius=6)
     f.text(26.3, 0.5, "10분 1,000원", 0.3, (255, 255, 255), bold=False)
-    f.rect(29, 35, 0, 3.4, (110, 140, 165), lit=150)                 # 로비
+    f.rect(28.5, 33.2, 0, 3.4, (110, 140, 165), lit=150)             # 로비
     rf.append(f)
-    f = Facade(BUILDING_LINE, 46, 80, 12, (150, 156, 166))
-    f.windows(46.5, 79.5, 3.5, 11.5, 8, 3, (110, 116, 126), (150, 172, 192), 0.3, 3)
+    # ③ 다음 건물 □□타워 (목적지를 지나치면 바로 나오는 경사로)
+    f = Facade(BUILDING_LINE, 34, 62, 16, (150, 156, 166))
+    f.windows(34.5, 61.5, 4.6, 15, 7, 3, (110, 116, 126), (150, 172, 192), 0.3, 3)
+    f.rect(34, 62, 15.2, 16, (128, 134, 146))
+    f.text(48, 15.6, "□□타워", 0.7, (255, 255, 255))
+    ramp_facade(f, RAMP3, "□□타워 주차장", (130, 40, 52), 255)
+    f.rect(43, 50, 0, 3.2, (110, 140, 165), lit=120)                 # 로비
+    rf.append(f)
+    f = Facade(BUILDING_LINE, 62, 80, 12, (176, 160, 150))
+    f.windows(62.5, 79.5, 3.5, 11.5, 4, 3, (130, 116, 108), (150, 172, 192), 0.3, 5)
     rf.append(f)
     f = Facade(BUILDING_LINE, 80, 260, 16, (176, 170, 160))
     f.windows(80.5, 259, 3.5, 15, 30, 4, (130, 126, 120), (150, 172, 192), 0.3, 4)
@@ -226,7 +236,7 @@ def draw_ground(img, cam):
     zn, zf = cam.near, 400
     poly(d, cam, [(CURB, 0, zn), (BUILDING_LINE, 0, zn), (BUILDING_LINE, 0, zf), (CURB, 0, zf)], (178, 174, 168))
     poly(d, cam, [(LEFT_LINE + 2.5, 0, zn), (LEFT_LINE, 0, zn), (LEFT_LINE, 0, zf), (LEFT_LINE + 2.5, 0, zf)], (170, 166, 160))
-    for a, b in (RAMP1, RAMP2):  # 경사로 앞 인도 (차가 지나가는 턱 낮춘 부분)
+    for a, b in RAMPS:  # 경사로 앞 인도 (차가 지나가는 턱 낮춘 부분)
         a = max(a, zn)
         if a < b:
             poly(d, cam, [(CURB, 0, a), (BUILDING_LINE, 0, a), (BUILDING_LINE, 0, b), (CURB, 0, b)], (140, 140, 140))
@@ -291,11 +301,11 @@ def render_scene(cam):
     right, left = build_world()
     for f in left:
         f.place(img, lit, cam)
-    for r in (RAMP1, RAMP2):
+    for r in RAMPS:
         draw_ramp_interior(img, lit, cam, r)
     for f in reversed(right):  # 먼 건물부터
         f.place(img, lit, cam)
-    for z in (28.0, 52.0, 80.0):
+    for z in (28.0, 54.0, 80.0):
         street_lamp(img, lit, cam, z)
     return img.convert("RGB"), lit
 
@@ -341,13 +351,18 @@ def mark_target(d, q, label, pos=None):
     pill(d, pos[0], pos[1], label, (255, 196, 0), (0, 0, 0), 34)
 
 
-def mark_wrong(d, q, label):
+def mark_wrong(d, q, label, above=False, size=30):
     tl, tr, br, bl = grow(q, 0.82)
-    d.line([tl, br], fill=(255, 80, 60), width=11 * SS)
-    d.line([tr, bl], fill=(255, 80, 60), width=11 * SS)
+    qw = max(p[0] for p in q) - min(p[0] for p in q)
+    w = int(max(4 * SS, min(11 * SS, qw / 10)))  # 멀리 있는 작은 입구는 가는 선
+    d.line([tl, br], fill=(255, 80, 60), width=w)
+    d.line([tr, bl], fill=(255, 80, 60), width=w)
     bx = sum(p[0] for p in q) / 4
-    by = max(p[1] for p in q)
-    pill(d, min(bx, W - 170 * SS), by + 62 * SS, label, (230, 60, 45), (255, 255, 255), 30)
+    if above:
+        y = min(p[1] for p in q) - 78 * SS  # 간판 바로 위
+    else:
+        y = max(p[1] for p in q) + 62 * SS
+    pill(d, min(bx, W - 170 * SS), y, label, (230, 60, 45), (255, 255, 255), size)
 
 
 def turn_arrow(img, start, end, ctrl):
@@ -408,6 +423,7 @@ def main():
     def far_marks(img):
         d = ImageDraw.Draw(img)
         mark_wrong(d, opening_quad(far_cam, RAMP1), "① 옆 건물")
+        mark_wrong(d, opening_quad(far_cam, RAMP3), "③ 다음 건물", above=True, size=26)
         mark_target(d, opening_quad(far_cam, RAMP2), "② 여기로 진입")
 
     # near: 꺾기 직전, 목적지 경사로 약 7m 앞 (입구를 비스듬히)
@@ -417,6 +433,7 @@ def main():
         q = opening_quad(near_cam, RAMP2)  # [먼 쪽 위, 가까운 쪽 위, 가까운 쪽 아래, 먼 쪽 아래]
         d = ImageDraw.Draw(img)
         near_bottom = q[2]
+        mark_wrong(d, opening_quad(near_cam, RAMP3), "다음 건물 · 아님", above=True, size=26)
         mark_target(d, q, "여기로 진입", pos=(near_bottom[0] - 70 * SS, near_bottom[1] + 70 * SS))
         # 바닥 가운데보다 조금 먼 쪽, 입구 안쪽을 가리킨다
         tip = (q[3][0] * 0.55 + q[2][0] * 0.45, (q[3][1] * 0.55 + q[2][1] * 0.45) - 40 * SS)

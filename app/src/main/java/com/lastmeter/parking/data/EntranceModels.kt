@@ -29,7 +29,9 @@ data class Entrance(
     val heightLimitM: Double?,
     val feeText: String?,
     val hoursText: String?,
+    /** 운전자 시점 사진. 입구 30~50m 앞 차선에서 진행 방향 앞을 비스듬히 (300m 전 화면). 촬영법: docs/data-collection.md 4절 */
     val photoFar: String?,
+    /** 운전자 시점 사진. 꺾기 직전 5~10m 앞에서 입구를 비스듬히 (입구 앞 화면). 정면 사진이 아니다 */
     val photoNear: String?,
     /** 바로 옆에 있어서 헷갈리는 다른 건물 입구 */
     val confusers: List<Confuser>,

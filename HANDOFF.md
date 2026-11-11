@@ -39,7 +39,7 @@ SDK 별 확인 결과와 함정은 [docs/sdk-check.md](docs/sdk-check.md) 에 �
 
 1. **기획서 8항목 작성** (필수 제출물). 넣을 것: 구글 지도의 도착지 입구 강조 기능과의 차별점(몇 번째 경사로인지, 옆 건물 경고, 기어 P 연동), 눈에 띄는 표지를 쓰는 안내가 화면 보는 시간과 실수를 줄인다는 연구(May, Ross & Osman 2005), 빌트인 캠 확장 계획.
 2. **전원 서명 동의서** 준비.
-3. **실제 장소 조사**(3~5곳) → `entrances.json` 과 사진 교체. 방법: [docs/data-collection.md](docs/data-collection.md).
+3. **실제 장소 조사**(3~5곳) → `entrances.json` 과 사진 교체. 방법: [docs/data-collection.md](docs/data-collection.md). 사진은 **운전자 시점(비스듬히)** 으로 찍는다(11/11 변경, 정면 사진 아님). 지금 예시 그림(`tools/draw_example_entrance.py`)은 아직 정면 구도라 다시 그려야 한다(Pillow 필요).
 4. 실제 사진으로 시연 영상 다시 만들기 (`tools/video/make_demo_video.py`, 녹화 방법은 아래 6절).
 5. ~~release APK 를 `apk/` 에 넣기~~ → 11/11 임시 파일명 `apk/Team_ParkingEntrance_release.apk` 로 올림(v3 서명). 팀명·앱 이름이 정해지면 `strings.xml` 의 `app_name` 을 바꾸고 다시 빌드해서 `팀명_앱이름_release.apk` 로 바꾼다.
    - 빌드: `./gradlew assembleRelease` (약 11분, 대부분 lintVital 단계). 결과는 `app/build/outputs/apk/release/app-release.apk`.

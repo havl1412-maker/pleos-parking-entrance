@@ -11,7 +11,7 @@
     <uses-permission android:name="pleos.car.permission.CAR_DRIVE" />
     <!-- 내비 목적지·경로 정보 조회 -->
     <uses-permission android:name="pleos.car.permission.NAVI_ROUTE" />
-    <!-- 내비 목적지 요청 (보조 기능) -->
+    <!-- 내비 목적지를 진짜 주차장 입구 좌표로 바꿔 요청 (경로 안내는 순정 내비가 한다) -->
     <uses-permission android:name="pleos.car.permission.NAVI_ROUTE_SEARCH" />
     <!-- 위치, 근접 알림 -->
     <uses-permission android:name="pleos.car.permission.FUSED_LOCATION" />

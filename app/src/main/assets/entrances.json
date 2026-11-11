@@ -1,11 +1,23 @@
 {
   "version": 1,
-  "note": "시연용 입구 데이터. dev-로 시작하는 항목은 에뮬레이터 개발용 가짜 데이터(실제 장소 아님)이며 시연 전에 실제 수집 데이터로 바꾼다. 수집 방법: docs/data-collection.md 입구가 여러 개면 300m 안에 들어설 때 달리는 방향과 approachBearingDeg 가 가장 잘 맞는 입구로 안내한다. photoFarNight/photoNearNight 는 밤 사진(선택).",
+  "note": "시연용 입구 데이터. dev-로 시작하는 항목은 에뮬레이터 개발용 가짜 데이터(실제 장소 아님)이며 시연 전에 실제 수집 데이터로 바꾼다. 수집 방법: docs/data-collection.md 입구가 여러 개면 300m 안에 들어설 때 달리는 방향과 approachBearingDeg 가 가장 잘 맞는 입구로 안내한다. photoFarNight/photoNearNight 는 밤 사진(선택). schedule 은 요일·시간별 운영 상태(PAID 유료 / FREE 무료 개방 / CLOSED 폐쇄)이고, 맞는 규칙이 없는 시간은 otherwise 다. holidays 는 공휴일(MM-DD 는 해마다, YYYY-MM-DD 는 그해만. 설·추석·대체 공휴일은 직접 넣는다). naviLat/naviLng 는 내비에서 이 건물을 고르면 안내가 끝나는 지점(선택). 입구와 멀면 앱이 내비 목적지를 입구로 바꾸자고 한다.",
+  "holidays": [
+    "01-01",
+    "03-01",
+    "05-05",
+    "06-06",
+    "08-15",
+    "10-03",
+    "10-09",
+    "12-25"
+  ],
   "facilities": [
     {
       "id": "dev-001",
       "name": "개발용 가상 상가",
       "address": "에뮬레이터 기본 위치 근처 (실제 장소 아님)",
+      "naviLat": 37.415,
+      "naviLng": 127.095,
       "entrances": [
         {
           "id": "dev-001-in-1",
@@ -27,6 +39,12 @@
               "description": "첫 번째 경사로는 옆 건물 주차장이에요",
               "lat": 37.4143,
               "lng": 127.09468
+            },
+            {
+              "description": "세 번째 경사로는 다음 건물 □□타워 주차장이에요",
+              "lat": 37.41465,
+              "lng": 127.09468,
+              "after": true
             }
           ],
           "photoFarNight": "dev-001-in-1-far-night.png",
@@ -48,6 +66,116 @@
           "photoFar": null,
           "photoNear": null,
           "confusers": []
+        }
+      ]
+    },
+    {
+      "id": "dev-002",
+      "name": "개발용 공영 주차장",
+      "address": "에뮬레이터 기본 위치 근처 (실제 장소 아님, 운영 시간 시연용)",
+      "entrances": [
+        {
+          "id": "dev-002-in-1",
+          "kind": "IN",
+          "lat": 37.4145,
+          "lng": 127.09468,
+          "approachBearingDeg": 0,
+          "roadSide": "RIGHT",
+          "orderFromApproach": 2,
+          "landmark": "편의점 바로 다음 경사로",
+          "speech": "오른쪽, 편의점 바로 다음 경사로가 주차장 입구예요.",
+          "heightLimitM": 2.3,
+          "feeText": "5분 250원",
+          "hoursText": "평일 09~19시 · 토 09~15시 유료, 그 외 무료 개방",
+          "photoFar": "dev-001-in-1-far.png",
+          "photoNear": "dev-001-in-1-near.png",
+          "confusers": [
+            {
+              "description": "첫 번째 경사로는 옆 건물 주차장이에요",
+              "lat": 37.4143,
+              "lng": 127.09468
+            },
+            {
+              "description": "세 번째 경사로는 다음 건물 □□타워 주차장이에요",
+              "lat": 37.41465,
+              "lng": 127.09468,
+              "after": true
+            }
+          ],
+          "photoFarNight": "dev-001-in-1-far-night.png",
+          "photoNearNight": "dev-001-in-1-near-night.png",
+          "schedule": {
+            "rules": [
+              {
+                "days": "공휴일",
+                "from": "00:00",
+                "to": "24:00",
+                "status": "FREE"
+              },
+              {
+                "days": "월-금",
+                "from": "09:00",
+                "to": "19:00",
+                "status": "PAID"
+              },
+              {
+                "days": "토",
+                "from": "09:00",
+                "to": "15:00",
+                "status": "PAID"
+              }
+            ],
+            "otherwise": "FREE"
+          }
+        }
+      ]
+    },
+    {
+      "id": "dev-003",
+      "name": "개발용 야간 폐쇄 빌딩",
+      "address": "에뮬레이터 기본 위치 근처 (실제 장소 아님, 운영 시간 시연용)",
+      "entrances": [
+        {
+          "id": "dev-003-in-1",
+          "kind": "IN",
+          "lat": 37.4145,
+          "lng": 127.09468,
+          "approachBearingDeg": 0,
+          "roadSide": "RIGHT",
+          "orderFromApproach": 2,
+          "landmark": "편의점 바로 다음 경사로",
+          "speech": "오른쪽, 편의점 바로 다음 경사로가 주차장 입구예요.",
+          "heightLimitM": 2.3,
+          "feeText": "10분 1,000원",
+          "hoursText": "매일 07~22시 (밤에는 문을 닫음)",
+          "photoFar": "dev-001-in-1-far.png",
+          "photoNear": "dev-001-in-1-near.png",
+          "confusers": [
+            {
+              "description": "첫 번째 경사로는 옆 건물 주차장이에요",
+              "lat": 37.4143,
+              "lng": 127.09468
+            },
+            {
+              "description": "세 번째 경사로는 다음 건물 □□타워 주차장이에요",
+              "lat": 37.41465,
+              "lng": 127.09468,
+              "after": true
+            }
+          ],
+          "photoFarNight": "dev-001-in-1-far-night.png",
+          "photoNearNight": "dev-001-in-1-near-night.png",
+          "schedule": {
+            "rules": [
+              {
+                "days": "매일",
+                "from": "07:00",
+                "to": "22:00",
+                "status": "PAID"
+              }
+            ],
+            "otherwise": "CLOSED"
+          }
         }
       ]
     }

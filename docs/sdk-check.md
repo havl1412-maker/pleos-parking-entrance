@@ -6,7 +6,7 @@ Pleos Connect 에뮬레이터 v2.1.0에서 앱의 "SDK 점검판" 화면으로 �
 
 | 항목 | 결과 | 핵심 |
 |---|---|---|
-| 내비 연동 (NaviHelper 3.0.5) | 동작 | 목적지 이름·좌표·남은 거리를 받을 수 있음. 앱에서 목적지 요청도 됨 |
+| 내비 연동 (NaviHelper 3.0.5) | 동작 | 목적지 이름·좌표·남은 거리를 받을 수 있음. 앱에서 목적지 요청도 됨(11/11: 앱 기능에 쓰지 않아 점검판에서 빼고 `NAVI_ROUTE_SEARCH` 권한도 뺐다) |
 | 위치 (FusedLocation 1.1.3) | 동작 | 약 1초마다 갱신. 실행 중 권한 요청 필요 |
 | 근접 알림 | 동작 | 반경 300m ENTER/EXIT가 1~3초 안에 옴 |
 | 기어 (Vehicle 2.3.2) | 동작 | GEAR_PARK / GEAR_DRIVE. 단, deprecated API |
@@ -93,3 +93,42 @@ Pleos Connect 에뮬레이터 v2.1.0에서 앱의 "SDK 점검판" 화면으로 �
 - 해결: 앱 화면이 보일 때(`onStart`) 서비스를 켜 두고, 목적지가 없어져도 끄지 않는다(`GuidanceController.ensureKeepAlive`).
 - 결과: 우리 앱이 뒤에 있는 상태에서 내비 목적지 → 안내 대상 자동 선택 → 300m 전 음성 → 입구 앞 옆 건물 경고 음성 → 내비 위 도착 알림까지 동작했다. 프로세스는 `curProcState=4`(포그라운드 서비스), `isFrozen=false`.
 - 함께 고친 것: `GuidanceController` 의 `init` 블록이 `naviListener` 선언보다 앞에 있어 `NaviHelper.addListener(null)` 로 내비 연동이 조용히 실패하고 있었다(11/10 구조 변경 때 생김). `init` 을 클래스 끝으로 옮겼다.
+
+## 10. 전조등·와이퍼·속도 — 2026-11-11 확인
+
+차량 상태에 맞춰 안내를 바꾸려고 확인했다. 메서드 이름과 권한은 공식 문서에서, 실제 값은 에뮬레이터 실행 로그에서 확인했다(디컴파일하지 않음).
+
+| 신호 | 결과 | 앱에서 쓰는 곳 |
+|---|---|---|
+| 전조등(하향등) | 동작 | 쓰지 않는다. 만들어서 확인했지만, 화면 밤 모드가 이미 자동으로 바뀌어 얻는 것이 적고 권한을 늘려야 해서 뺐다 |
+| 와이퍼 | 보류 | (엔진만 준비) 비가 오면 미리 보기를 더 일찍 |
+| 속도 | SDK 에 없음 | 위치 변화로 직접 구한다 |
+
+**전조등**
+- `vehicle.getLight().getCurrentLowBeamLightState(onComplete, onFailed)` → 값을 글자로 찍으면 `ON` / `OFF`. `getLowBeamLightSwitch` 도 같은 값이 왔다.
+- 권한 `pleos.car.permission.CAR_LIGHTS`. 설치 때 자동으로 허용됐다(`granted=true`, 기어의 `CAR_DRIVE` 와 같음). 권한 표: https://document.pleos.ai/en/docs/pleos-only/connect-sdk-pleos/Vehicle/vehicle-permission
+- Virtual Console: Emulation Controls > Exterior Lights Mode. **Low beam 일 때만 `ON`**, Off·Auto·Tail lamp 는 `OFF`. 스크립트로는 `PUT /vehicle/lights?feature=headlamp_mode&value=LowBeam` (`Off`, `Auto`, `Position`).
+- 변화 리스너(`registerLowBeamLightState`)는 시험하지 않았다. 기어처럼 1초마다 조회한다.
+- 메서드 목록: https://document.pleos.ai/en/docs/pleos-only/connect-sdk-pleos/Vehicle/vehicle/ai.pleos.playground.vehicle.api/light/entry
+
+**와이퍼 (보류)**
+- `vehicle.getWiper().getCurrentWiperSwitch(...)`, `getCurrentWiperState(...)` 가 있다. 다만 첫 인자로 `ai.pleos.playground.vehicle.api.model.area.WindowArea` 를 받는데, 이 값을 만드는 방법(앞 유리를 가리키는 값)을 문서에서 읽지 못했다. 문서 쪽이 자동으로는 본문이 안 읽힌다. 브라우저로 열어 확인할 것: https://document.pleos.ai/en/docs/pleos-only/connect-sdk-pleos/Vehicle/vehicle/ai.pleos.playground.vehicle.api.model.area/window-area/entry
+- 권한도 문서마다 다르다. 권한 표에는 "Window, Wiper → `CAR_WINDOWS`", Vehicle SDK 샘플 앱 안내에는 `pleos.car.permission.READ_WINDSHIELD_WIPERS` 가 나온다(https://document.pleos.ai/en/docs/pleos-only/tutorial/vehicle-sdk-sample-app). 어느 쪽인지 확인하기 전에는 선언하지 않는다.
+- Virtual Console 에는 Windshield Wiper Switch(Off/Auto/Low/High)가 있다. `PUT /vehicle/body?front_wiper=Low`.
+- 앱 쪽 준비: `GuidanceEngine.extraLeadSec` 에 10을 넣으면 미리 보기가 10초 더 일찍 뜬다(단위 테스트 있음).
+
+**속도**
+- Vehicle SDK 문서에 속도 API 가 없다. 릴리스 노트에 v2.3.1 에서 `VehicleSpeedListener` 를 뺐다고 나온다(https://document.pleos.ai/en/docs/pleos-only/release-note/sdk-release-note). 위치 SDK 의 `LocationData` 에도 속도 칸이 없다(2절).
+- 그래서 최근 5초 동안의 위치 변화로 속도를 구한다(`GuidanceEngine.updateSpeed`). 1초에 70m 넘게 움직인 것으로 나오면 위치가 튄 것으로 보고 버린다. 시각은 위치를 받은 순간의 기기 시계를 쓴다.
+- 에뮬레이터에서 `demo-drive` 로 초속 8m 를 넣으면 앱 로그에 시속 24~31km 로 찍힌다(스크립트가 한 바퀴에 1초보다 조금 더 걸린다).
+
+**Virtual Console 을 스크립트로 조작하기**
+- `GET /vehicle/catalog` 에 조작할 수 있는 항목과 주소가 다 나온다. 먼저 `POST /browser/session?client=이름` 을 보내야 하고(3초마다 끊긴다), 그다음 `PUT /vehicle/gear?gear=Drive` 처럼 보낸다.
+
+## 11. 내비 목적지를 주차장 입구로 바꾸기 — 2026-11-11 에뮬레이터 확인
+
+- `NaviHelper.requestRoute(RouteInfo(latitude, longitude, poiId = "", poiName, poiSubId = "", address))` 로 순정 내비 목적지를 바꿀 수 있다. `poiId` 를 비워도 된다. 권한 `pleos.car.permission.NAVI_ROUTE_SEARCH` (설치 때 허용됨).
+- 노트북 에뮬레이터에서 DNS 가 살아 있으면 내비가 실제로 경로를 계산했다(1.7km, 8분). 1절의 "에뮬레이터 내비는 경로를 계산하지 않는다"는 DNS 가 안 되던 때의 결과일 수 있다.
+- 요청하면 내비는 목적지를 잠깐 비웠다가(`onDestinationInfo` 좌표 0,0 이 몇 번) 새 목적지를 알려 준다. 새 목적지의 좌표는 우리가 보낸 입구 좌표 그대로였고, 이름은 우리가 보낸 `poiName`("개발용 가상 상가 주차장 입구")으로 내비 화면에 나왔다.
+- 창을 나눠 둔 상태에서는 분할이 유지됐다.
+- 참고(시스템 로그): 내비의 `PlaceSenseRemoteConnector` 가 목적지마다 `GuidancePoint(..., isEntrance=true, entranceToPointDist=...)` 를 보낸다. 순정 내비에도 "입구" 개념이 있는 것으로 보인다. 공개 API 는 아니라 쓰지 않는다. 사무국 문의 거리.

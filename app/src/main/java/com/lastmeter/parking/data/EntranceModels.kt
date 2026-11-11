@@ -6,6 +6,12 @@ data class Facility(
     val name: String,
     val address: String,
     val entrances: List<Entrance>,
+    /**
+     * 내비에서 이 건물을 목적지로 고르면 보통 안내가 끝나는 지점(지도의 건물 위치). 선택.
+     * 입구와 떨어져 있으면 앱이 내비 목적지를 입구로 바꾸자고 한다(guidance/RouteAdjust.kt). 없으면 입구 좌표로만 판단한다
+     */
+    val naviLat: Double? = null,
+    val naviLng: Double? = null,
 )
 
 enum class EntranceKind { IN, OUT, BOTH }
@@ -38,12 +44,25 @@ data class Entrance(
     /** 밤에 찍은 사진(선택). 밤 모드일 때 있으면 이쪽을 보여 준다. 밤에는 간판 불빛이 달라 낮 사진으로는 알아보기 어렵다 */
     val photoFarNight: String? = null,
     val photoNearNight: String? = null,
+    /** 요일·시간별 운영 상태(유료/무료 개방/폐쇄). hoursText 는 사람이 읽는 글이고, 이것은 앱이 지금 시각과 견주는 표다. 없으면 판단하지 않는다 */
+    val schedule: OpeningHours? = null,
 ) {
     val canEnter: Boolean get() = kind != EntranceKind.OUT
 }
 
+/**
+ * 헷갈리는 다른 건물 입구. 목적지 앞쪽(먼저 나오는 경사로)이 기본이고,
+ * after=true 면 목적지를 지나치면 바로 나오는 뒤쪽 경사로다. 지나친 직후가 엉뚱한 곳에 들어가기 가장 쉬운 순간이라 따로 경고한다.
+ */
 data class Confuser(
     val description: String,
     val lat: Double,
     val lng: Double,
+    val after: Boolean = false,
 )
+
+/** 목적지보다 먼저 나오는 헷갈리는 입구 */
+val Entrance.confuserBefore: Confuser? get() = confusers.firstOrNull { !it.after }
+
+/** 목적지를 지나치면 바로 나오는 헷갈리는 입구 */
+val Entrance.confuserAfter: Confuser? get() = confusers.firstOrNull { it.after }

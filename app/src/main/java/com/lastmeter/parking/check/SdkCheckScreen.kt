@@ -41,10 +41,6 @@ fun SdkCheckScreen(vm: SdkCheckViewModel, onRequestLocationPermission: () -> Uni
                 "현재 위치 조회" to vm::naviGetCurrentLocation,
                 "TBT 조회" to vm::naviGetTbt,
             )
-            Buttons(
-                "시험 목적지 요청" to vm::naviRequestTestRoute,
-                "경로 취소" to vm::naviCancelRoute,
-            )
 
             Section("2·3. 위치, 근접 알림")
             Buttons(

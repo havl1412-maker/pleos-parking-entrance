@@ -19,7 +19,6 @@ import ai.pleos.playground.navi.data.DestinationArrivedInfo
 import ai.pleos.playground.navi.data.DestinationInfo
 import ai.pleos.playground.navi.data.DrivingInfo
 import ai.pleos.playground.navi.data.RecentDestinationInfo
-import ai.pleos.playground.navi.data.RouteInfo
 import ai.pleos.playground.navi.data.RouteStartInfo
 import ai.pleos.playground.navi.data.RouteStateInfo
 import ai.pleos.playground.navi.data.TBTInfo
@@ -98,21 +97,8 @@ class SdkCheckViewModel(app: Application) : AndroidViewModel(app), NaviHelperEve
     fun naviGetCurrentLocation() = guarded("NAVI", "getCurrentLocationInfo") { requireNavi().getCurrentLocationInfo() }
     fun naviGetTbt() = guarded("NAVI", "getTBTInfo") { requireNavi().getTBTInfo() }
 
-    /** 순정 내비 목적지를 앱에서 바꿀 수 있는지 확인 (공식 샘플과 같은 시험 좌표) */
-    fun naviRequestTestRoute() = guarded("NAVI", "requestRoute(시험 좌표)") {
-        requireNavi().requestRoute(
-            RouteInfo(
-                latitude = 37.48544722,
-                longitude = 127.03636666,
-                poiId = "36khp37hh8gqcm5nqhe5",
-                poiName = "42dot",
-                poiSubId = "0",
-                address = "서울시 강남구 남부순환로 2621",
-            )
-        )
-    }
-
-    fun naviCancelRoute() = guarded("NAVI", "cancelRoute") { requireNavi().cancelRoute() }
+    // 목적지 요청(requestRoute)·취소 시험은 11/08 에 확인을 마치고 뺐다(docs/sdk-check.md 1절).
+    // 지금은 앱 기능(내비 목적지를 주차장 입구로 바꾸기, GuidanceController.applyRouteAdjust)에서 requestRoute 를 쓴다.
 
     private fun requireNavi(): NaviHelper = naviHelper ?: error("NaviHelper 먼저 initialize")
 

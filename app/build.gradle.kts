@@ -78,4 +78,5 @@ dependencies {
     implementation(libs.bundles.pleos.sdk)
 
     testImplementation(libs.junit)
+    testImplementation(libs.json)
 }

@@ -67,7 +67,17 @@
 
 ## APK
 
-`apk/` 폴더에 release 빌드를 올립니다.
+[apk/Team_ParkingEntrance_release.apk](apk/Team_ParkingEntrance_release.apk) (release 빌드, v3 서명, 파일명은 임시로 팀명·앱 이름이 정해지면 바뀝니다)
+
+설치 (에뮬레이터 사용자 10):
+
+```
+adb install apk/Team_ParkingEntrance_release.apk
+adb shell pm grant --user 10 com.lastmeter.parking pleos.car.permission.FUSED_LOCATION
+adb shell pm grant --user 10 com.lastmeter.parking android.permission.POST_NOTIFICATIONS
+```
+
+디버그판이 깔려 있으면 서명이 달라 설치가 실패합니다. `adb uninstall com.lastmeter.parking` 후 설치하세요.
 
 ## 다음 단계
 

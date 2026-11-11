@@ -41,7 +41,9 @@ SDK 별 확인 결과와 함정은 [docs/sdk-check.md](docs/sdk-check.md) 에 �
 2. **전원 서명 동의서** 준비.
 3. **실제 장소 조사**(3~5곳) → `entrances.json` 과 사진 교체. 방법: [docs/data-collection.md](docs/data-collection.md).
 4. 실제 사진으로 시연 영상 다시 만들기 (`tools/video/make_demo_video.py`, 녹화 방법은 아래 6절).
-5. release APK 를 `apk/` 에 넣기 (`팀명_앱이름_release.apk`). 앱 이름·팀 이름 미정.
+5. ~~release APK 를 `apk/` 에 넣기~~ → 11/11 임시 파일명 `apk/Team_ParkingEntrance_release.apk` 로 올림(v3 서명). 팀명·앱 이름이 정해지면 `strings.xml` 의 `app_name` 을 바꾸고 다시 빌드해서 `팀명_앱이름_release.apk` 로 바꾼다.
+   - 빌드: `./gradlew assembleRelease` (약 11분, 대부분 lintVital 단계). 결과는 `app/build/outputs/apk/release/app-release.apk`.
+   - 서명 키는 저장소 밖에 있다(노트북 `C:\pleos\keys\release.jks` + `keystore.properties`). 저장소 루트에 `keystore.properties` 를 복사해 두면 서명된다(깃에 안 올라감). **키를 잃어버리면 앱 업데이트가 불가능**하므로 USB 등에 따로 백업하고, 다른 컴퓨터에서 release 를 만들 때도 같은 키를 쓴다.
 6. 사무국 문의: 앱이 내비 옆 칸에 스스로 뜨는 방법, 차량 속도 신호, 빌트인 캠 접근, `getGear` 대체 API.
 7. 공공 주차장 입구 데이터 문의: [docs/seoul-data-inquiry.md](docs/seoul-data-inquiry.md) 문구 사용.
 

@@ -1,4 +1,4 @@
-# 에뮬레이터에 가짜 주행 위치를 1초마다 넣어서, 앱이 실제 Pleos 위치 SDK로 받아 안내하는 흐름을 시연한다.
+﻿# 에뮬레이터에 가짜 주행 위치를 1초마다 넣어서, 앱이 실제 Pleos 위치 SDK로 받아 안내하는 흐름을 시연한다.
 # 사용법 (PowerShell):
 #   .\tools\demo-drive.ps1                 # 개발용 입구(dev-001)로 다가가서 도착
 #   .\tools\demo-drive.ps1 -Scenario pass  # 입구를 지나쳤다가 멈춤

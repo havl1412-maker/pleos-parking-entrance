@@ -73,8 +73,8 @@
 Pleos Connect 에뮬레이터 v2.1.0 이 켜져 있다고 가정합니다. 에뮬레이터 사용자는 10번입니다.
 
 ```bash
-# 1) Release 의 APK 설치와 권한
-adb install 둠_마지막300M_release.apk
+# 1) APK 설치와 권한 (저장소 apk/ 폴더의 파일, 또는 Release 의 Doom_Last300M_release.apk)
+adb install apk/둠_마지막300M_release.apk
 adb shell pm grant --user 10 com.lastmeter.parking pleos.car.permission.FUSED_LOCATION
 adb shell pm grant --user 10 com.lastmeter.parking android.permission.POST_NOTIFICATIONS
 adb forward tcp:8088 tcp:8088          # Virtual Console: http://127.0.0.1:8088/
@@ -96,7 +96,7 @@ adb forward tcp:8088 tcp:8088          # Virtual Console: http://127.0.0.1:8088/
 | 화면 규격 | 2560 × 1440 (가로형). 내비 옆 반쪽 칸(약 850 × 1210)이 기본, 앱 영역 전체로 띄우면 사진 왼쪽·안내 오른쪽 배치. 낮/밤 모드 지원 |
 | 차량 상태 | Pleos Connect Virtual Console (기어), `adb emu geo fix` (위치) |
 | 빌드 | Android Studio, Kotlin, Jetpack Compose, AGP 9.5, Gradle 9.8, compileSdk 37.2, targetSdk 34, minSdk 28 |
-| APK | [Release](https://github.com/havl1412-maker/pleos-parking-entrance/releases/latest) 또는 [apk/둠_마지막300M_release.apk](apk/%EB%91%A0_%EB%A7%88%EC%A7%80%EB%A7%89300M_release.apk) (release 빌드, v3 서명) |
+| APK | [apk/둠_마지막300M_release.apk](apk/%EB%91%A0_%EB%A7%88%EC%A7%80%EB%A7%89300M_release.apk) (release 빌드, v3 서명). 같은 파일이 [Release v1.0.0](https://github.com/havl1412-maker/pleos-parking-entrance/releases/latest) 에 `Doom_Last300M_release.apk` 로도 있습니다(GitHub Release 는 파일 이름에 한글을 쓸 수 없음) |
 
 ## 사용한 SDK와 권한
 

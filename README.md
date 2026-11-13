@@ -16,7 +16,7 @@
 |---|---|---|
 | ![](docs/images/06-night-mode.png) | ![](docs/images/07-height-warning.png) | ![](docs/images/05-arrival-popup.png) |
 
-시연 영상: [docs/demo/demo_parking_entrance.mp4](docs/demo/demo_parking_entrance.mp4) (에뮬레이터 화면, 입구 그림은 예시)
+시연 영상 (에뮬레이터 화면 녹화, 한국어 자막, 입구 그림은 예시): [1편 내비 목적지 바로잡기·입구 안내·주차](docs/demo/demo_1_navi_fix_and_entrance.mp4) · [2편 운영 시간·지나침·무료 개방](docs/demo/demo_2_hours_and_passed.mp4) · [11/10 전체 흐름](docs/demo/demo_parking_entrance.mp4)
 
 ## 하는 일
 
@@ -77,7 +77,9 @@
 
 ## 테스트 환경
 
-- Pleos Connect Emulator v2.1.0 (Android 14, API 34), Automotive AVD
+- Pleos Connect Emulator v2.1.0 (Android 14, API 34), Automotive AVD (Cold boot, RAM 4GB)
+- 화면 규격: 2560 × 1440 (가로형). 앱은 내비 옆 반쪽 칸(약 850 × 1210)에 맞춰 설계했고, 앱 영역 전체(두 칸)로 띄우면 사진 왼쪽·안내 오른쪽 배치로 바뀐다. 낮/밤 모드 모두 지원
+- 시연 영상: [docs/demo/demo_1_navi_fix_and_entrance.mp4](docs/demo/demo_1_navi_fix_and_entrance.mp4), [docs/demo/demo_2_hours_and_passed.mp4](docs/demo/demo_2_hours_and_passed.mp4) (2560 × 1440 화면 녹화, 한국어 자막)
 - Android Studio, Kotlin, minSdk 28, Gradle 8.0 이상
 - 개발 환경 세팅: [docs/setup.md](docs/setup.md)
 

@@ -6,7 +6,7 @@
 
 - 공모전: 현대자동차그룹 차량용 앱 개발 공모전 (Pleos Connect). 1차 마감 **2026-11-15(일) 23:59**. 필수 = 기획서(8항목) + 전원 서명 동의서, 가산점 = 시연 영상 · GitHub(소스 + APK).
 - 앱: 상가 밀집 지역에서 붙어 있는 경사로 중 진짜 주차장 입구를 알려 주는 Pleos Connect 앱. 에뮬레이터 v2.1.0 에서 전체 흐름이 동작한다.
-- 시연 영상: [docs/demo/demo_parking_entrance.mp4](docs/demo/demo_parking_entrance.mp4) (3분 18초, 11/10 화면 기준). 입구 그림은 예시 그림이고 에뮬레이터 화면이다.
+- 시연 영상: [docs/demo/demo_parking_entrance.mp4](demo/demo_parking_entrance.mp4) (3분 18초, 11/10 화면 기준). 입구 그림은 예시 그림이고 에뮬레이터 화면이다.
 - 입구 데이터는 아직 가짜(`dev-001`, 실제 장소 아님)다.
 
 ## 2. 되는 것
@@ -28,12 +28,12 @@
 | 화면이 내려가 있어도 음성 안내 + 도착 알림 팝업 | `GuidanceKeepAliveService.kt`, `ArrivalNotifier.kt` |
 | SDK 점검판(개발용) | `check/` |
 
-SDK 별 확인 결과와 함정은 [docs/sdk-check.md](docs/sdk-check.md) 에 있다. 특히 8절(화면이 내려가 있을 때)을 읽을 것.
+SDK 별 확인 결과와 함정은 [docs/sdk-check.md](sdk-check.md) 에 있다. 특히 8절(화면이 내려가 있을 때)을 읽을 것.
 
 ## 3. 알아 둘 제약
 
 - 앱이 스스로 내비 옆 칸에 뜨는 방법은 없다(시스템이 막음). 미리 창을 나눠 두거나, 도착 알림을 눌러야 한다.
-- 공개 Pleos SDK 에 카메라 API 가 없다. 빌트인 캠은 계획으로만 둔다 → [docs/roadmap.md](docs/roadmap.md).
+- 공개 Pleos SDK 에 카메라 API 가 없다. 빌트인 캠은 계획으로만 둔다 → [docs/roadmap.md](roadmap.md).
 - Pleos SDK 디컴파일·역분석 금지(라이선스). 필드는 문서·샘플·실행 로그로만 확인한다.
 - 내비가 아닌 앱은 "몇 m 앞 우회전" 같은 경로 안내를 하면 안 된다(단일 경로 정책).
 - 블라인드 심사: 저장소·README·커밋·영상·기획서에 실명·학교·동아리 이름을 쓰지 않는다.
@@ -46,8 +46,8 @@ SDK 별 확인 결과와 함정은 [docs/sdk-check.md](docs/sdk-check.md) 에 �
 - 개발용 SDK 점검판 버튼은 debug 빌드에서만 보인다(release 에서는 숨김). 점검판의 "시험 목적지 요청·경로 취소"는 뺐다.
 - `NAVI_ROUTE_SEARCH` 권한은 11/11 에 한 번 뺐다가, 내비 목적지 바로잡기 기능에 쓰려고 다시 넣었다. 경로 안내는 순정 내비가 하고 우리는 목적지 좌표만 바꾸므로 단일 경로 정책에 맞는다고 판단했다. 사무국 문의 목록에 "서드파티 앱이 목적지를 바꿔도 되는지, 자동으로 바꿔도 되는지"를 넣을 것.
 - 내비는 목적지를 바꿀 때 잠깐 목적지를 비웠다가(좌표 0,0) 새 목적지를 알려 준다. 그때마다 안내 대상이 잠깐 풀렸다가 다시 잡힌다. 출발 전에는 문제없지만, 입구 바로 앞에서 목적지를 바꾸면 미리 보기 음성이 다시 나올 수 있다.
-- 전조등 연동(하향등이 켜져 있으면 밤 사진)은 11/11 에 만들어서 에뮬레이터로 확인했지만 뺐다. 화면 밤 모드가 이미 자동으로 바뀌어서 얻는 것이 적고, 권한(`CAR_LIGHTS`)을 하나 더 선언해야 했기 때문이다. 확인한 내용은 [docs/sdk-check.md](docs/sdk-check.md) 10절에 남겨 두었다.
-- 와이퍼 연동(비가 오면 미리 보기를 10초 더 일찍)은 엔진 쪽(`GuidanceEngine.extraLeadSec`, 테스트 있음)만 만들어 두고 차량 신호와는 잇지 않았다. Wiper API 가 첫 인자로 받는 `WindowArea` 값을 만드는 방법을 공식 문서에서 확인하지 못했기 때문이다. 확인되면 `GuidanceController` 에서 와이퍼가 켜졌을 때 `extraLeadSec = 10.0` 으로 두고 권한을 선언하면 된다 → [docs/sdk-check.md](docs/sdk-check.md) 10절.
+- 전조등 연동(하향등이 켜져 있으면 밤 사진)은 11/11 에 만들어서 에뮬레이터로 확인했지만 뺐다. 화면 밤 모드가 이미 자동으로 바뀌어서 얻는 것이 적고, 권한(`CAR_LIGHTS`)을 하나 더 선언해야 했기 때문이다. 확인한 내용은 [docs/sdk-check.md](sdk-check.md) 10절에 남겨 두었다.
+- 와이퍼 연동(비가 오면 미리 보기를 10초 더 일찍)은 엔진 쪽(`GuidanceEngine.extraLeadSec`, 테스트 있음)만 만들어 두고 차량 신호와는 잇지 않았다. Wiper API 가 첫 인자로 받는 `WindowArea` 값을 만드는 방법을 공식 문서에서 확인하지 못했기 때문이다. 확인되면 `GuidanceController` 에서 와이퍼가 켜졌을 때 `extraLeadSec = 10.0` 으로 두고 권한을 선언하면 된다 → [docs/sdk-check.md](sdk-check.md) 10절.
 - 공휴일: `entrances.json` 의 `holidays` 에 해마다 같은 날(1/1, 3/1, 5/5, 6/6, 8/15, 10/3, 10/9, 12/25)만 넣어 두었다. 설·추석·대체 공휴일은 해마다 달라서 직접 넣어야 한다.
 - 에뮬레이터를 켠 채 gradle 빌드를 돌리면 에뮬레이터가 꺼지거나, 살아 있어도 위치가 앱에 안 들어올 때가 있다(11/11: 내비 목적지·기어는 되는데 `위치` 로그가 0건). 에뮬레이터를 다시 켜면 된다. 빌드 후에는 `gradlew --stop` 으로 데몬을 내려 메모리를 비운다.
 
@@ -55,17 +55,17 @@ SDK 별 확인 결과와 함정은 [docs/sdk-check.md](docs/sdk-check.md) 에 �
 
 1. **기획서 8항목 작성** (필수 제출물). 넣을 것: 구글 지도의 도착지 입구 강조 기능과의 차별점(몇 번째 경사로인지, 옆 건물 경고, 기어 P 연동), 눈에 띄는 표지를 쓰는 안내가 화면 보는 시간과 실수를 줄인다는 연구(May, Ross & Osman 2005), 빌트인 캠 확장 계획.
 2. **전원 서명 동의서** 준비.
-3. **실제 장소 조사**(3~5곳) → `entrances.json` 과 사진 교체. 방법: [docs/data-collection.md](docs/data-collection.md). 사진은 **운전자 시점(비스듬히)** 으로 찍는다(11/11 변경, 정면 사진 아님). 지금 예시 그림(`tools/draw_example_entrance.py`)은 아직 정면 구도라 다시 그려야 한다(Pillow 필요).
+3. **실제 장소 조사**(3~5곳) → `entrances.json` 과 사진 교체. 방법: [docs/data-collection.md](data-collection.md). 사진은 **운전자 시점(비스듬히)** 으로 찍는다(11/11 변경, 정면 사진 아님). 지금 예시 그림(`tools/draw_example_entrance.py`)은 아직 정면 구도라 다시 그려야 한다(Pillow 필요).
 4. 실제 사진으로 시연 영상 다시 만들기 (`tools/video/make_demo_video.py`, 녹화 방법은 아래 6절).
 5. ~~release APK 를 `apk/` 에 넣기~~ → 11/11 팀명 **둠**, 앱 이름 **마지막300M** 으로 확정. `strings.xml` 의 `app_name` 을 바꿨고 APK 는 `apk/둠_마지막300M_release.apk` (이전 임시 이름 `Team_ParkingEntrance_release.apk`). 이름을 바꾼 뒤에는 release 를 다시 빌드해서 이 파일을 덮어쓴다.
    - 빌드: `./gradlew assembleRelease` (약 11분, 대부분 lintVital 단계). 결과는 `app/build/outputs/apk/release/app-release.apk`.
    - 서명 키는 저장소 밖에 있다(노트북 `C:\pleos\keys\release.jks` + `keystore.properties`). 저장소 루트에 `keystore.properties` 를 복사해 두면 서명된다(깃에 안 올라감). **키를 잃어버리면 앱 업데이트가 불가능**하므로 USB 등에 따로 백업하고, 다른 컴퓨터에서 release 를 만들 때도 같은 키를 쓴다.
 6. 사무국 문의: 앱이 내비 옆 칸에 스스로 뜨는 방법, 차량 속도 신호, 빌트인 캠 접근, `getGear` 대체 API.
-7. 공공 주차장 입구 데이터 문의: [docs/seoul-data-inquiry.md](docs/seoul-data-inquiry.md) 문구 사용.
+7. 공공 주차장 입구 데이터 문의: [docs/seoul-data-inquiry.md](seoul-data-inquiry.md) 문구 사용.
 
 ## 5. 새 컴퓨터 세팅
 
-자세한 순서는 [docs/setup.md](docs/setup.md). 요약:
+자세한 순서는 [docs/setup.md](setup.md). 요약:
 
 1. Git, Android Studio(내장 JDK 사용) 설치 후 이 저장소를 받는다.
 2. SDK Manager 에 Pleos 업데이트 사이트를 추가하고 API 34 Pleos Connect 시스템 이미지를 설치한다(약 4GB, 라이선스 동의 필요). Android SDK Platform 34 와 37.2 도 필요하다(`compileSdk 37.2`, `targetSdk 34`).

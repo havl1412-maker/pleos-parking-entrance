@@ -3,7 +3,7 @@ name: Android CI
 # 단위 테스트(71개)와 debug 빌드를 확인한다. release 서명 키는 저장소에 없으므로 debug 만 빌드한다.
 on:
   push:
-    branches: [ main, ci-check ]
+    branches: [ main ]
   pull_request:
   workflow_dispatch:
 
